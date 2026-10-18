@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}ورود به سامانه{% endblock %}
+
+{% block content %}
+<div class="form-card" style="margin-block-start: 2rem;">
+  <h1 class="form-title">ورود به پنل کتابخانه</h1>
+
+  {% if form.errors %}
+    <div class="alert alert-error">
+      <span>نام کاربری یا رمز عبور اشتباه است. لطفاً دوباره تلاش کنید.</span>
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next|default:'/library/' }}">
+
+    <div class="form-group">
+      <label class="form-label" for="id_username">نام کاربری</label>
+      <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required id="id_username" class="form-input" dir="ltr" placeholder="admin">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="id_password">رمز عبور</label>
+      <input type="password" name="password" autocomplete="current-password" required id="id_password" class="form-input" dir="ltr">
+    </div>
+
+    <div class="form-actions" style="justify-content: space-between;">
+      <a href="{% url 'library:home' %}" class="btn btn-secondary">بازگشت</a>
+      <button type="submit" class="btn btn-primary">ورود به حساب</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

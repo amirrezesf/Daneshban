@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}حذف درس: {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">حذف درس</span>
+</nav>
+
+<div class="form-card" style="border-color: var(--danger-border);">
+  <h1 class="form-title" style="color: var(--danger);">تأیید حذف درس</h1>
+
+  <p style="margin-block-end: 1rem; font-size: 1.05rem;">
+    آیا از حذف درس <strong>«{{ lesson.title }}»</strong> اطمینان دارید؟
+  </p>
+
+  <div class="alert alert-error">
+    <span>
+      توجه: با حذف این درس، تمام منابع آموزشی، جزوات، اسلایدها و تمرینات مرتبط با آن ({{ lesson.resources.count|persian_digits }} مورد) نیز به‌طور کامل حذف خواهند شد. این عملیات قابل بازگشت نیست!
+    </span>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions" style="justify-content: space-between;">
+      <a href="{{ lesson.get_absolute_url }}" class="btn btn-secondary">انصراف و بازگشت</a>
+      <button type="submit" class="btn btn-danger">بله، درس حذف شود</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  {% if is_edit %}
+    <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">ویرایش درس</span>
+  {% else %}
+    <span class="breadcrumb-current">افزودن درس جدید</span>
+  {% endif %}
+</nav>
+
+<div class="form-card">
+  <h1 class="form-title">{{ title }}</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.title.id_for_label }}">عنوان درس *</label>
+      {{ form.title }}
+      {% if form.title.errors %}
+        <span class="form-error">{{ form.title.errors.0 }}</span>
+      {% endif %}
+      <span class="form-help">نام درس مانند «معادلات دیفرانسیل» یا «مبانی کامپیوتر»</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.professor.id_for_label }}">استاد درس</label>
+      {{ form.professor }}
+      {% if form.professor.errors %}
+        <span class="form-error">{{ form.professor.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.semester.id_for_label }}">ترم تحصیلی</label>
+      {{ form.semester }}
+      {% if form.semester.errors %}
+        <span class="form-error">{{ form.semester.errors.0 }}</span>
+      {% endif %}
+      <span class="form-help">انتخاب ترم برای دسته‌بندی دوره‌ای دروس (اختیاری)</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.color.id_for_label }}">رنگ شاخص کارت درس</label>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        {{ form.color }}
+        <span style="font-size: 0.85rem; color: var(--text-muted);">رنگی برای تمایز این درس در فهرست اصلی</span>
+      </div>
+      {% if form.color.errors %}
+        <span class="form-error">{{ form.color.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات و سرفصل‌ها</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <span class="form-error">{{ form.description.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      {% if is_edit %}
+        <a href="{{ lesson.get_absolute_url }}" class="btn btn-secondary">انصراف</a>
+      {% else %}
+        <a href="{% url 'library:home' %}" class="btn btn-secondary">انصراف</a>
+      {% endif %}
+      <button type="submit" class="btn btn-primary">
+        {% if is_edit %}ذخیره تغییرات{% else %}ثبت درس جدید{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

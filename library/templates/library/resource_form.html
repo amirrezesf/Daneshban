@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  {% if is_edit %}
+    <a href="{{ resource.lesson.get_absolute_url }}">{{ resource.lesson.title }}</a>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">ویرایش منبع</span>
+  {% else %}
+    <span class="breadcrumb-current">بارگذاری منبع جدید</span>
+  {% endif %}
+</nav>
+
+<div class="form-card">
+  <h1 class="form-title">{{ title }}</h1>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.lesson.id_for_label }}">درس مربوطه *</label>
+      {{ form.lesson }}
+      {% if form.lesson.errors %}
+        <span class="form-error">{{ form.lesson.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.title.id_for_label }}">عنوان منبع *</label>
+      {{ form.title }}
+      {% if form.title.errors %}
+        <span class="form-error">{{ form.title.errors.0 }}</span>
+      {% endif %}
+      <span class="form-help">مثال: «جزوه کامل فصل ۳ - مشتق و کاربردها»</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label class="form-label" for="{{ form.kind.id_for_label }}">نوع منبع *</label>
+        {{ form.kind }}
+        {% if form.kind.errors %}
+          <span class="form-error">{{ form.kind.errors.0 }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.session_number.id_for_label }}">شماره جلسه (اختیاری)</label>
+        {{ form.session_number }}
+        {% if form.session_number.errors %}
+          <span class="form-error">{{ form.session_number.errors.0 }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.file.id_for_label }}">
+        فایل پیوست {% if not is_edit %}*{% else %}(اختیاری){% endif %}
+      </label>
+      {{ form.file }}
+      {% if is_edit and resource.file %}
+        <span class="form-help" style="margin-block-start: 0.5rem; display: block;">
+          فایل فعلی: <bdi dir="ltr">{{ resource.file.name }}</bdi> (در صورت عدم انتخاب فایل جدید، همین فایل حفظ می‌شود)
+        </span>
+      {% endif %}
+      {% if form.file.errors %}
+        <span class="form-error">{{ form.file.errors.0 }}</span>
+      {% endif %}
+      <span class="form-help">
+        پسوندهای مجاز: pdf, doc, docx, ppt, pptx, xls, xlsx, txt, md, zip, rar, 7z, png, jpg, jpeg (حداکثر ۱۰۰ مگابایت)
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.tags.id_for_label }}">برچسب‌ها (اختیاری)</label>
+      {{ form.tags }}
+      {% if form.tags.errors %}
+        <span class="form-error">{{ form.tags.errors.0 }}</span>
+      {% endif %}
+      <span class="form-help">با کاما جدا کنید (مانند: میان‌ترم، مبحث ماتریس، حل تمرین)</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="{{ form.description.id_for_label }}">توضیحات تکمیلی (اختیاری)</label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <span class="form-error">{{ form.description.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-actions">
+      {% if is_edit %}
+        <a href="{{ resource.lesson.get_absolute_url }}" class="btn btn-secondary">انصراف</a>
+      {% else %}
+        <a href="{% url 'library:home' %}" class="btn btn-secondary">انصراف</a>
+      {% endif %}
+      <button type="submit" class="btn btn-primary">
+        {% if is_edit %}ذخیره تغییرات{% else %}بارگذاری و ثبت منبع{% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

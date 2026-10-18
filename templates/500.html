@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}خطای سرور (۵۰۰){% endblock %}
+
+{% block content %}
+<div class="empty-state" style="max-width: 600px; margin-inline: auto; margin-block: 4rem;">
+  <svg class="empty-state-icon" style="color: var(--danger);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+  <h1 class="empty-state-title" style="font-size: 1.6rem;">خطای داخلی در پردازش درخواست</h1>
+  <p class="empty-state-desc">متأسفانه در پردازش درخواست خطایی رخ داده است. لطفاً چند لحظه بعد مجدداً تلاش نمایید.</p>
+  <a href="{% url 'library:home' %}" class="btn btn-primary">بازگشت به صفحه اصلی</a>
+</div>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}نتایج جستجو برای «{{ query }}»{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">نتایج جستجو</span>
+</nav>
+
+<!-- Search Box Toolbar -->
+<form method="get" action="{% url 'library:search' %}" class="catalog-toolbar" style="margin-block-end: 2rem;">
+  <div class="search-input-wrapper">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <input 
+      type="search" 
+      name="q" 
+      value="{{ query }}" 
+      class="search-input" 
+      placeholder="جستجو در عنوان جزوه، درس، استاد، برچسب‌ها..."
+      dir="auto"
+      autofocus
+    >
+  </div>
+  <button type="submit" class="btn btn-primary btn-sm">جستجوی مجدد</button>
+</form>
+
+<div style="margin-block-end: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+  <h1 style="font-size: 1.35rem; font-weight: 700; color: var(--text-primary);">
+    {% if query %}
+      نتایج جستجو برای: <span style="color: var(--accent);">«{{ query }}»</span>
+    {% else %}
+      جستجو در منابع دانشگاهی
+    {% endif %}
+  </h1>
+  <span style="font-size: 0.9rem; color: var(--text-muted); font-variant-numeric: tabular-nums;">
+    {{ total_results|persian_digits }} مورد یافت شد
+  </span>
+</div>
+
+{% if page_obj.object_list %}
+  <div class="resource-group-panel">
+    <table class="resources-table">
+      <thead>
+        <tr>
+          <th scope="col" style="inline-size: 38%;">عنوان منبع و توضیحات</th>
+          <th scope="col">درس مربوطه</th>
+          <th scope="col">نوع منبع</th>
+          <th scope="col">حجم</th>
+          <th scope="col">تاریخ</th>
+          <th scope="col" style="text-align: end;">دریافت</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in page_obj.object_list %}
+          <tr>
+            <td>
+              <div class="file-cell">
+                <span class="file-type-badge file-type-{{ item.file_extension }}">
+                  {{ item.file_extension|default:"file" }}
+                </span>
+                <div>
+                  <div class="file-name-title">{{ item.title }}</div>
+                  {% if item.description %}
+                    <div class="file-desc-sub">{{ item.description|truncatewords:15 }}</div>
+                  {% endif %}
+                  {% if item.tags %}
+                    <div class="tag-list">
+                      {% for tag in item.tags|split_tags %}
+                        <span class="unboxed-tag">#{{ tag }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <a href="{{ item.lesson.get_absolute_url }}" style="font-weight: 600; color: var(--text-primary);">
+                {{ item.lesson.title }}
+              </a>
+              {% if item.lesson.professor %}
+                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.lesson.professor }}</div>
+              {% endif %}
+            </td>
+
+            <td>
+              <span style="font-size: 0.85rem; color: var(--text-secondary);">{{ item.get_kind_display }}</span>
+            </td>
+
+            <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+              {{ item.file_size|persian_filesize }}
+            </td>
+
+            <td style="color: var(--text-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums;">
+              {{ item.uploaded_at|jalali_date }}
+            </td>
+
+            <td>
+              <div class="table-actions" style="display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
+                {% if item.can_preview_in_browser %}
+                  <a href="{% url 'library:resource_viewer' item.id %}" class="btn btn-secondary btn-sm" title="پیش‌نمایش در مرورگر">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>پیش‌نمایش</span>
+                  </a>
+                {% elif item.is_office_file %}
+                  <a href="{% url 'library:resource_viewer' item.id %}" class="btn btn-secondary btn-sm" title="باز کردن در برنامه آفیس">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <span>باز کردن</span>
+                  </a>
+                {% endif %}
+
+                <a href="{% url 'library:resource_download' item.id %}" class="btn btn-primary btn-sm" title="دانلود فایل">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>دانلود</span>
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav class="pagination" aria-label="صفحه‌بندی نتایج جستجو">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&q={{ query }}" class="pagination-item">قبلی</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="pagination-item pagination-current">{{ num|persian_digits }}</span>
+        {% else %}
+          <a href="?page={{ num }}&q={{ query }}" class="pagination-item">{{ num|persian_digits }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&q={{ query }}" class="pagination-item">بعدی</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+{% else %}
+  <div class="empty-state">
+    <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    <h2 class="empty-state-title">نتیجه‌ای یافت نشد</h2>
+    <p class="empty-state-desc">
+      متأسفانه هیچ منبع یا درسی منطبق با عبارت «{{ query }}» پیدا نشد. لطفاً با کلمات کلیدی دیگری جستجو نمایید.
+    </p>
+    <a href="{% url 'library:home' %}" class="btn btn-secondary">بازگشت به صفحه اصلی</a>
+  </div>
+{% endif %}
+{% endblock %}

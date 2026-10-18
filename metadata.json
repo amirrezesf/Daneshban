@@ -1,0 +1,6 @@
+{
+  "name": "کتابخانه دانشگاهی",
+  "description": "سامانه مدیریت جزوه‌ها، اسلایدها و منابع درسی دانشگاه با تقویم شمسی و رابط کاربری فارسی",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

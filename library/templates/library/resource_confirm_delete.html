@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}حذف منبع: {{ resource.title }}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">حذف منبع</span>
+</nav>
+
+<div class="form-card" style="border-color: var(--danger-border);">
+  <h1 class="form-title" style="color: var(--danger);">تأیید حذف منبع آموزشی</h1>
+
+  <p style="margin-block-end: 1rem; font-size: 1.05rem;">
+    آیا از حذف منبع <strong>«{{ resource.title }}»</strong> مربوط به درس <strong>«{{ lesson.title }}»</strong> اطمینان دارید؟
+  </p>
+
+  <div class="alert alert-warning">
+    <span>
+      فایل مرتبط با این منبع (<bdi dir="ltr">{{ resource.file.name }}</bdi>) به همراه کلیه آمار دانلود آن حذف خواهد شد.
+    </span>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions" style="justify-content: space-between;">
+      <a href="{{ lesson.get_absolute_url }}" class="btn btn-secondary">انصراف و بازگشت</a>
+      <button type="submit" class="btn btn-danger">بله، منبع حذف شود</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

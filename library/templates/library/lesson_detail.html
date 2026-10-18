@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}{{ lesson.title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  {% if lesson.semester %}
+    <span>{{ lesson.semester.title }}</span>
+    <span class="breadcrumb-sep">/</span>
+  {% endif %}
+  <span class="breadcrumb-current">{{ lesson.title }}</span>
+</nav>
+
+<!-- Lesson Detail Header -->
+<header class="lesson-detail-header">
+  <div class="lesson-detail-topbar">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-block-end: 0.5rem;">
+        <span class="lesson-card-indicator" style="width: 14px; height: 14px; background-color: {{ lesson.color|default:'#2563eb' }};" title="نشانگر درس"></span>
+        <h1 class="lesson-title-large" style="margin-block-end: 0;">{{ lesson.title }}</h1>
+      </div>
+
+      <!-- Zero-Pill Unboxed Metadata -->
+      <div class="lesson-meta-unboxed" style="margin-block-end: 0; font-size: 0.95rem;">
+        {% if lesson.professor %}
+          <span>استاد: <strong>{{ lesson.professor }}</strong></span>
+        {% endif %}
+        {% if lesson.semester %}
+          <span class="sep">·</span>
+          <span>{{ lesson.semester.title }}</span>
+        {% endif %}
+        <span class="sep">·</span>
+        <span style="color: var(--accent); font-weight: 600;">{{ total_resources|persian_digits }} منبع آموزشی ثبت‌شده</span>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+      {% if user.is_authenticated %}
+        <a href="{% url 'library:resource_create' %}?lesson={{ lesson.id }}" class="btn btn-primary btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>آپلود منبع جدید</span>
+        </a>
+        <a href="{% url 'library:lesson_edit' lesson.slug %}" class="btn btn-secondary btn-sm" title="ویرایش اطلاعات درس">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          <span>ویرایش</span>
+        </a>
+        <a href="{% url 'library:lesson_delete' lesson.slug %}" class="btn btn-secondary btn-sm" style="color: var(--danger);" title="حذف درس">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>حذف</span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if lesson.description %}
+    <div style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.8; margin-block-start: 1.25rem; padding-block-start: 1rem; border-block-start: 1px solid var(--border-subtle);">
+      {{ lesson.description|linebreaks }}
+    </div>
+  {% endif %}
+</header>
+
+<!-- Resource Groups -->
+{% if resource_groups %}
+  <div class="resource-groups-container">
+    {% for group in resource_groups %}
+      <section class="resource-group-panel" aria-labelledby="group-title-{{ group.code }}">
+        <header class="resource-group-header">
+          <h2 id="group-title-{{ group.code }}" class="resource-group-heading">
+            {% if group.code == 'handout' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tag-handout);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              <span>{{ group.label }}‌ها</span>
+            {% elif group.code == 'slides' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tag-slides);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>{{ group.label }}‌ها</span>
+            {% elif group.code == 'assignment' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tag-assignment);"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              <span>{{ group.label }}‌ها</span>
+            {% elif group.code == 'exam' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tag-exam);"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              <span>{{ group.label }}‌ها</span>
+            {% elif group.code == 'book' %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--tag-book);"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"></path></svg>
+              <span>{{ group.label }}‌ها</span>
+            {% else %}
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              <span>{{ group.label }}</span>
+            {% endif %}
+          </h2>
+          <span class="resource-group-count">{{ group.count|persian_digits }} مورد</span>
+        </header>
+
+        <table class="resources-table">
+          <thead>
+            <tr>
+              <th scope="col" style="inline-size: 42%;">عنوان فایل و توضیحات</th>
+              <th scope="col">جلسه</th>
+              <th scope="col">حجم فایل</th>
+              <th scope="col">تاریخ بارگذاری</th>
+              <th scope="col">دانلودها</th>
+              <th scope="col" style="text-align: end;">دریافت فایل</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in group.items %}
+              <tr>
+                <td>
+                  <div class="file-cell">
+                    <span class="file-type-badge file-type-{{ item.file_extension }}">
+                      {{ item.file_extension|default:"file" }}
+                    </span>
+                    <div>
+                      <div class="file-name-title">{{ item.title }}</div>
+                      {% if item.description %}
+                        <div class="file-desc-sub">{{ item.description }}</div>
+                      {% endif %}
+                      {% if item.tags %}
+                        <div class="tag-list">
+                          {% for tag in item.tags|split_tags %}
+                            <span class="unboxed-tag">#{{ tag }}</span>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </td>
+
+                <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+                  {% if item.session_number %}
+                    جلسه {{ item.session_number|persian_digits }}
+                  {% else %}
+                    <span style="opacity: 0.4;">—</span>
+                  {% endif %}
+                </td>
+
+                <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+                  {{ item.file_size|persian_filesize }}
+                </td>
+
+                <td style="color: var(--text-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums;">
+                  {{ item.uploaded_at|jalali_date }}
+                </td>
+
+                <td style="color: var(--text-muted); font-variant-numeric: tabular-nums;">
+                  {{ item.download_count|persian_digits }}
+                </td>
+
+                <td>
+                  <div class="table-actions" style="display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
+                    {% if item.can_preview_in_browser %}
+                      <a href="{% url 'library:resource_viewer' item.id %}" class="btn btn-secondary btn-sm" title="پیش‌نمایش در مرورگر">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>پیش‌نمایش</span>
+                      </a>
+                    {% elif item.is_office_file %}
+                      <a href="{% url 'library:resource_viewer' item.id %}" class="btn btn-secondary btn-sm" title="باز کردن در برنامه‌های آفیس یا مرورگر">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        <span>باز کردن</span>
+                      </a>
+                    {% endif %}
+
+                    <a href="{% url 'library:resource_download' item.id %}" class="btn btn-primary btn-sm" title="دانلود مستقیم فایل">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                      <span>دانلود</span>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                      <a href="{% url 'library:resource_edit' item.id %}" class="btn btn-ghost btn-sm" title="ویرایش">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 20h9"></path>
+                          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                      </a>
+                      <a href="{% url 'library:resource_delete' item.id %}" class="btn btn-secondary btn-sm" style="color: var(--danger);" title="حذف">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+    {% endfor %}
+  </div>
+
+{% else %}
+  <div class="empty-state">
+    <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+      <polyline points="14 2 14 8 20 8"></polyline>
+    </svg>
+    <h2 class="empty-state-title">هنوز فایلی برای این درس اضافه نشده است.</h2>
+    <p class="empty-state-desc">می‌توانید جزوه‌ها، اسلایدهای آموزشی، صورت تمرینات و نمونه سوالات امتحانی مربوط به این درس را بارگذاری کنید.</p>
+    {% if user.is_authenticated %}
+      <a href="{% url 'library:resource_create' %}?lesson={{ lesson.id }}" class="btn btn-primary">
+        بارگذاری اولین منبع
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn-secondary">
+        ورود به حساب جهت بارگذاری منبع
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}
