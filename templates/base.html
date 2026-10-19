@@ -1,16 +1,18 @@
 {% load static persian_tags %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}کتابخانه دانشگاهی{% endblock %} — سامانه منابع و جزوه‌ها</title>
-  <meta name="description" content="سامانه دانشگاهی مدیریت و دسترسی به جزوه‌ها، اسلایدها، تمرین‌ها و نمونه سوالات درسی با تقویم شمسی">
+  <meta name="description"
+    content="سامانه دانشگاهی مدیریت و دسترسی به جزوه‌ها، اسلایدها، تمرین‌ها و نمونه سوالات درسی با تقویم شمسی">
   <meta name="font" content="Vazirmatn">
-  
+
   <!-- Instant Theme & Sidebar State Script (anti-flicker) -->
   <script>
-    (function() {
+    (function () {
       try {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
@@ -20,13 +22,14 @@
         } else {
           document.documentElement.setAttribute('data-theme', 'light');
         }
-      } catch (e) {}
+      } catch (e) { }
     })();
   </script>
 
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
+
 <body>
   <a href="#main-content" class="skip-link">پرش به محتوای اصلی</a>
 
@@ -35,8 +38,10 @@
     <div class="header-inner" style="padding-inline: 1.25rem;">
       <!-- Left (Inline-Start in RTL): Sidebar Mobile Toggle & Brand Wordmark -->
       <div style="display: flex; align-items: center; gap: 0.85rem;">
-        <button type="button" id="mobile-sidebar-toggle" class="btn btn-ghost btn-sm" aria-label="منوی کناری" style="display: none;" title="نمایش سایدبار">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" id="mobile-sidebar-toggle" class="btn btn-ghost btn-sm" aria-label="منوی کناری"
+          style="display: none;" title="نمایش سایدبار">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -45,10 +50,11 @@
 
         <a href="{% url 'library:home' %}" class="brand-link" title="سامانه کتابخانه دانشگاهی">
           <span class="brand-logo-mark" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/>
-              <path d="M6 6h10"/>
-              <path d="M6 10h10"/>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20" />
+              <path d="M6 6h10" />
+              <path d="M6 10h10" />
             </svg>
           </span>
           <span>کتابخانه دانشگاهی</span>
@@ -58,29 +64,27 @@
       <!-- Center: Quick GitLab-style global search bar -->
       <div style="flex: 1; max-width: 480px; margin-inline: 1.5rem;" class="nav-search-bar">
         <form method="get" action="{% url 'library:search' %}" style="position: relative; width: 100%;">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input 
-            type="search" 
-            name="q" 
-            class="search-input" 
-            placeholder="جستجوی سریع دروس، جزوات، اسلایدها..."
-            style="padding-block: 0.45rem; font-size: 0.85rem;"
-            dir="auto"
-          >
+          <input type="search" name="q" class="search-input" placeholder="جستجوی سریع دروس، جزوات، اسلایدها..."
+            style="padding-block: 0.45rem; font-size: 0.85rem;" dir="auto">
         </form>
       </div>
 
       <!-- Right (Inline-End in RTL): Theme Switcher & Actions -->
       <div class="nav-actions">
         <!-- Dual Theme Toggle Button -->
-        <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" aria-label="تغییر تم تاریک و روشن" title="تغییر حالت تم">
-          <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" aria-label="تغییر تم تاریک و روشن"
+          title="تغییر حالت تم">
+          <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+          <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -94,28 +98,30 @@
         </button>
 
         {% if user.is_authenticated %}
-          <a href="{% url 'library:lesson_create' %}" class="btn btn-primary btn-sm" title="افزودن درس جدید">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span>درس جدید</span>
-          </a>
-          <form method="post" action="{% url 'logout' %}" style="display: inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-ghost btn-sm" title="خروج از حساب">
-              <span>خروج</span>
-            </button>
-          </form>
+        <a href="{% url 'library:lesson_create' %}" class="btn btn-primary btn-sm" title="افزودن درس جدید">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>درس جدید</span>
+        </a>
+        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-ghost btn-sm" title="خروج از حساب">
+            <span>خروج</span>
+          </button>
+        </form>
         {% else %}
-          <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-              <polyline points="10 17 15 12 10 7"/>
-              <line x1="15" y1="12" x2="3" y2="12"/>
-            </svg>
-            <span>ورود مسئول</span>
-          </a>
+        <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" y1="12" x2="3" y2="12" />
+          </svg>
+          <span>ورود مسئول</span>
+        </a>
         {% endif %}
       </div>
     </div>
@@ -131,11 +137,14 @@
           <div class="sidebar-section-header">مخزن دانشگاه</div>
           <ul class="sidebar-nav-list">
             <li class="sidebar-nav-item">
-              <a href="{% url 'library:home' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" title="نمای کلی دروس">
+              <a href="{% url 'library:home' %}"
+                class="sidebar-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+                title="نمای کلی دروس">
                 <span class="sidebar-nav-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
                   </svg>
                 </span>
                 <span class="sidebar-label">فهرست دروس</span>
@@ -143,9 +152,12 @@
             </li>
 
             <li class="sidebar-nav-item">
-              <a href="{% url 'library:search' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'search' %}active{% endif %}" title="جستجوی پیشرفته">
+              <a href="{% url 'library:search' %}"
+                class="sidebar-nav-link {% if request.resolver_match.url_name == 'search' %}active{% endif %}"
+                title="جستجوی پیشرفته">
                 <span class="sidebar-nav-icon">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                   </svg>
@@ -161,20 +173,21 @@
           <div class="sidebar-section-header">ترم‌های تحصیلی</div>
           <ul class="sidebar-nav-list">
             {% for sem in sidebar_semesters %}
-              <li class="sidebar-nav-item">
-                <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="sidebar-nav-link" title="{{ sem.title }}">
-                  <span class="sidebar-nav-icon">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                  </span>
-                  <span class="sidebar-label">{{ sem.title }}</span>
-                  <span class="sidebar-badge">{{ sem.lessons.count|persian_digits }}</span>
-                </a>
-              </li>
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="sidebar-nav-link" title="{{ sem.title }}">
+                <span class="sidebar-nav-icon">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+                <span class="sidebar-label">{{ sem.title }}</span>
+                <span class="sidebar-badge">{{ sem.lessons.count|persian_digits }}</span>
+              </a>
+            </li>
             {% endfor %}
           </ul>
         </div>
@@ -184,106 +197,119 @@
           <div class="sidebar-section-header">واحدهای درسی</div>
           <ul class="sidebar-nav-list">
             {% for lsn in sidebar_lessons %}
-              <li class="sidebar-nav-item">
-                <a href="{{ lsn.get_absolute_url }}" class="sidebar-nav-link" title="{{ lsn.title }}">
-                  <span class="sidebar-nav-icon">
-                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: {{ lsn.color|default:'#2563eb' }};"></span>
-                  </span>
-                  <span class="sidebar-label">{{ lsn.title }}</span>
-                </a>
-              </li>
+            <li class="sidebar-nav-item">
+              <a href="{{ lsn.get_absolute_url }}" class="sidebar-nav-link" title="{{ lsn.title }}">
+                <span class="sidebar-nav-icon">
+                  <span
+                    style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: {{ lsn.color|default:'#2563eb' }};"></span>
+                </span>
+                <span class="sidebar-label">{{ lsn.title }}</span>
+              </a>
+            </li>
             {% empty %}
-              <li style="padding-inline: 0.75rem; font-size: 0.8rem; color: var(--text-muted);">
-                درسی ثبت نشده است
-              </li>
+            <li style="padding-inline: 0.75rem; font-size: 0.8rem; color: var(--text-muted);">
+              درسی ثبت نشده است
+            </li>
             {% endfor %}
           </ul>
         </div>
 
         <!-- Management Tools (if authenticated) -->
         {% if user.is_authenticated %}
-          <div>
-            <div class="sidebar-section-header">ابزارهای مدیریت</div>
-            <ul class="sidebar-nav-list">
-              <li class="sidebar-nav-item">
-                <a href="{% url 'library:lesson_create' %}" class="sidebar-nav-link">
-                  <span class="sidebar-nav-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                  </span>
-                  <span class="sidebar-label">افزودن درس جدید</span>
-                </a>
-              </li>
-              <li class="sidebar-nav-item">
-                <a href="{% url 'library:resource_create' %}" class="sidebar-nav-link">
-                  <span class="sidebar-nav-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="17 8 12 3 7 8"/>
-                      <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                  </span>
-                  <span class="sidebar-label">آپلود منبع آموزشی</span>
-                </a>
-              </li>
-              <li class="sidebar-nav-item">
-                <a href="/admin/" class="sidebar-nav-link">
-                  <span class="sidebar-nav-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                  </span>
-                  <span class="sidebar-label">پنل ادمین جنگو</span>
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div>
+          <div class="sidebar-section-header">ابزارهای مدیریت</div>
+          <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:lesson_create' %}" class="sidebar-nav-link">
+                <span class="sidebar-nav-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </span>
+                <span class="sidebar-label">افزودن درس جدید</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:resource_create' %}" class="sidebar-nav-link">
+                <span class="sidebar-nav-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                  </svg>
+                </span>
+                <span class="sidebar-label">آپلود منبع آموزشی</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="/admin/" class="sidebar-nav-link">
+                <span class="sidebar-nav-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                    </path>
+                  </svg>
+                </span>
+                <span class="sidebar-label">پنل ادمین جنگو</span>
+              </a>
+            </li>
+          </ul>
+        </div>
         {% endif %}
       </div>
 
       <!-- Expand/Collapse Toggle Footer -->
       <footer class="sidebar-footer">
-        <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn" aria-label="جمع کردن یا باز کردن سایدبار" title="جمع یا باز کردن منو">
-          <svg class="sidebar-toggle-icon icon-rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn"
+          aria-label="جمع کردن یا باز کردن سایدبار" title="جمع یا باز کردن منو">
+          <svg class="sidebar-toggle-icon icon-rtl-flip" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
           <span id="sidebar-toggle-text">جمع کردن منو</span>
         </button>
       </footer>
     </aside>
-
-    <!-- Main Content Area -->
-    <main id="main-content" class="app-content-body">
-      {% if messages %}
+    <div style="width: 100%;">
+      <!-- Main Content Area -->
+      <main id="main-content" class="app-content-body">
+        {% if messages %}
         <div class="messages-container" aria-live="polite">
           {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }}">
-              <span>{{ message }}</span>
-            </div>
+          <div class="alert alert-{{ message.tags|default:'info' }}">
+            <span>{{ message }}</span>
+          </div>
           {% endfor %}
         </div>
-      {% endif %}
+        {% endif %}
 
-      {% block content %}{% endblock %}
-    </main>
+        {% block content %}{% endblock %}
+      </main>
+      <!-- Minimal Footer -->
+      <footer class="site-footer">
+        <div class="container site-footer-inner">
+          <p style="font-weight: 500; color: var(--text-primary);">سامانه کتابخانه دانشگاهی — مدیریت یکپارچه جزوات،
+            اسلایدها و منابع درسی</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">
+            طراحی منظم الهام‌گرفته از ساختار مخازن GitLab با قابلیت جمع‌کردن سایدبار، پیش‌نمایش فایل‌ها و پوسته دوگانه
+          </p>
+        </div>
+      </footer>
+    </div>
+
+
   </div>
 
-  <!-- Minimal Footer -->
-  <footer class="site-footer">
-    <div class="container site-footer-inner">
-      <p style="font-weight: 500; color: var(--text-primary);">سامانه کتابخانه دانشگاهی — مدیریت یکپارچه جزوات، اسلایدها و منابع درسی</p>
-      <p style="font-size: 0.8rem; color: var(--text-muted);">
-        طراحی منظم الهام‌گرفته از ساختار مخازن GitLab با قابلیت جمع‌کردن سایدبار، پیش‌نمایش فایل‌ها و پوسته دوگانه
-      </p>
-    </div>
-  </footer>
+
 
   <!-- Scripts: Sidebar Collapse & Dual Theme -->
   <script>
-    (function() {
+    (function () {
       // 1. Theme Logic
       const themeBtn = document.getElementById('theme-toggle-btn');
       if (themeBtn) {
@@ -306,7 +332,7 @@
 
         updateIcons(getCurrentTheme() === 'dark');
 
-        themeBtn.addEventListener('click', function() {
+        themeBtn.addEventListener('click', function () {
           const current = getCurrentTheme();
           const nextTheme = current === 'dark' ? 'light' : 'dark';
           document.documentElement.setAttribute('data-theme', nextTheme);
@@ -329,7 +355,7 @@
           if (toggleText) toggleText.innerText = 'باز کردن منو';
         }
 
-        sidebarToggleBtn.addEventListener('click', function() {
+        sidebarToggleBtn.addEventListener('click', function () {
           sidebar.classList.toggle('collapsed');
           const nowCollapsed = sidebar.classList.contains('collapsed');
           localStorage.setItem('gitlab_sidebar_collapsed', nowCollapsed ? 'true' : 'false');
@@ -341,7 +367,7 @@
 
       // 3. Mobile Sidebar Drawer Toggle
       if (mobileToggleBtn && sidebar) {
-        mobileToggleBtn.addEventListener('click', function() {
+        mobileToggleBtn.addEventListener('click', function () {
           sidebar.classList.toggle('mobile-open');
         });
       }
@@ -350,4 +376,5 @@
 
   {% block extra_scripts %}{% endblock %}
 </body>
+
 </html>
