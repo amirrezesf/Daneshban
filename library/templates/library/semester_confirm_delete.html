@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}حذف ترم: {{ semester.title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="{% url 'library:semester_list' %}">مدیریت ترم‌ها</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">حذف ترم</span>
+</nav>
+
+<div class="form-card" style="border-color: var(--danger-border); max-width: 580px;">
+  <div style="display: flex; align-items: center; gap: 0.75rem; margin-block-end: 1rem;">
+    <span style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background-color: var(--danger-bg); color: var(--danger);">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </span>
+    <h1 class="form-title" style="color: var(--danger); margin-block-end: 0; border-block-end: none; padding-block-end: 0;">
+      تأیید حذف ترم تحصیلی
+    </h1>
+  </div>
+
+  <p style="margin-block-end: 1.25rem; font-size: 1.05rem; line-height: 1.6;">
+    آیا از حذف ترم تحصیلی <strong>«{{ semester.title }}»</strong>
+    {% if semester.season_and_year %}
+      با برچسب <strong>({{ semester.season_and_year }})</strong>
+    {% endif %}
+    اطمینان دارید؟
+  </p>
+
+  {% if lessons_count > 0 %}
+    <div class="alert alert-warning" style="margin-block-end: 1.5rem; line-height: 1.6;">
+      <span>
+        توجه: این ترم در حال حاضر شامل <strong>{{ lessons_count|persian_digits }} درس دانشگاهی</strong> است. با حذف این ترم، دروس مربوطه حذف نخواهند شد اما وضعیت ترم آن‌ها به «بدون ترم» تغییر می‌یابد و می‌توانید بعداً آن‌ها را به ترم دیگری منتقل کنید.
+      </span>
+    </div>
+  {% else %}
+    <div class="alert alert-info" style="margin-block-end: 1.5rem;">
+      <span>در حال حاضر هیچ درسی به این ترم اختصاص نیافته است و حذف آن ایمن می‌باشد.</span>
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-block-start: 1.5rem; border-block-start: 1px solid var(--border-subtle); padding-block-start: 1rem;">
+      <a href="{% url 'library:semester_list' %}" class="btn btn-secondary">
+        انصراف و بازگشت
+      </a>
+      <button type="submit" class="btn btn-secondary" style="background-color: var(--danger); color: #fff; border-color: var(--danger);">
+        بله، ترم حذف شود
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

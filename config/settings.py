@@ -21,6 +21,9 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.run.app',
+    'https://*.google.com',
+    'https://*.googleusercontent.com',
+    'https://*.usercontent.goog',
     'http://localhost:3000',
     'http://localhost:8000',
     'http://localhost:8001',
@@ -28,6 +31,10 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8000',
     'http://127.0.0.1:8001',
 ]
+
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow iframe preview in AI Studio
 X_FRAME_OPTIONS = 'SAMEORIGIN'

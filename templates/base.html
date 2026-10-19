@@ -170,21 +170,43 @@
 
         <!-- Semesters & Lessons Tree -->
         <div>
-          <div class="sidebar-section-header">ترم‌های تحصیلی</div>
+          <div class="sidebar-section-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <span>ترم‌های تحصیلی</span>
+            <a href="{% url 'library:semester_list' %}" title="مدیریت ترم‌ها" style="font-size: 0.75rem; color: var(--accent); text-decoration: none; font-weight: 500;">
+              مدیریت
+            </a>
+          </div>
           <ul class="sidebar-nav-list">
-            {% for sem in sidebar_semesters %}
             <li class="sidebar-nav-item">
-              <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="sidebar-nav-link" title="{{ sem.title }}">
+              <a href="{% url 'library:semester_list' %}" class="sidebar-nav-link {% if request.resolver_match.url_name == 'semester_list' %}active{% endif %}" title="مدیریت و تقویم کلیه ترم‌ها">
                 <span class="sidebar-nav-icon">
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                   </svg>
                 </span>
-                <span class="sidebar-label">{{ sem.title }}</span>
+                <span class="sidebar-label">همه ترم‌ها و تقویم</span>
+              </a>
+            </li>
+            {% for sem in sidebar_semesters %}
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="sidebar-nav-link" title="{{ sem.title }}{% if sem.season_and_year %} ({{ sem.season_and_year }}){% endif %}">
+                <span class="sidebar-nav-icon">
+                  {% if sem.season_info %}
+                    <span style="font-size: 0.9rem;" title="{{ sem.season_info.label }}">{{ sem.season_info.icon }}</span>
+                  {% else %}
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                    </svg>
+                  {% endif %}
+                </span>
+                <span class="sidebar-label">
+                  {{ sem.title }}
+                </span>
                 <span class="sidebar-badge">{{ sem.lessons.count|persian_digits }}</span>
               </a>
             </li>
@@ -219,6 +241,30 @@
         <div>
           <div class="sidebar-section-header">ابزارهای مدیریت</div>
           <ul class="sidebar-nav-list">
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:semester_list' %}" class="sidebar-nav-link {% if 'semester' in request.resolver_match.url_name %}active{% endif %}">
+                <span class="sidebar-nav-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </span>
+                <span class="sidebar-label">مدیریت ترم‌ها</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{% url 'library:semester_create' %}" class="sidebar-nav-link">
+                <span class="sidebar-nav-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </span>
+                <span class="sidebar-label">افزودن ترم جدید</span>
+              </a>
+            </li>
             <li class="sidebar-nav-item">
               <a href="{% url 'library:lesson_create' %}" class="sidebar-nav-link">
                 <span class="sidebar-nav-icon">

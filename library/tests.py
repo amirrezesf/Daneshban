@@ -191,3 +191,124 @@ class ViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "جزوه مکانیک")
         self.assertTrue(self.handout.can_preview_in_browser)
+
+
+class SemesterSeasonCalculationTests(TestCase):
+    """
+    آزمون محاسبه خودکار فصل و سال تحصیلی بر اساس تاریخ شروع ترم (شمسی/جلالی)
+    """
+    def test_autumn_calculation(self):
+        # 2025-09-23 corresponds to 1 Mehr 1404 (پاییز ۱۴۰۴)
+        sem = Semester.objects.create(
+            title="نیم‌سال اول",
+            start_date=datetime.date(2025, 9, 23),
+            order=1
+        )
+        self.assertEqual(sem.season, "پاییز")
+        self.assertIn("۱۴۰۴", sem.jalali_year)
+        self.assertEqual(sem.season_and_year, "پاییز ۱۴۰۴")
+        self.assertEqual(sem.season_info["season_code"], "autumn")
+
+    def test_winter_calculation(self):
+        # 2026-02-04 corresponds to 15 Bahman 1404 (زمستان ۱۴۰۴)
+        sem = Semester.objects.create(
+            title="نیم‌سال دوم",
+            start_date=datetime.date(2026, 2, 4),
+            order=2
+        )
+        self.assertEqual(sem.season, "زمستان")
+        self.assertEqual(sem.season_and_year, "زمستان ۱۴۰۴")
+        self.assertEqual(sem.season_info["season_code"], "winter")
+
+    def test_spring_calculation(self):
+        # 2026-04-04 corresponds to 15 Farvardin 1405 (بهار ۱۴۰۵)
+        sem = Semester.objects.create(
+            title="نیم‌سال بهار",
+            start_date=datetime.date(2026, 4, 4),
+            order=3
+        )
+        self.assertEqual(sem.season, "بهار")
+        self.assertEqual(sem.season_and_year, "بهار ۱۴۰۵")
+        self.assertEqual(sem.season_info["season_code"], "spring")
+
+    def test_summer_calculation(self):
+        # 2026-07-01 corresponds to 10 Tir 1405 (تابستان ۱۴۰۵)
+        sem = Semester.objects.create(
+            title="ترم تابستان",
+            start_date=datetime.date(2026, 7, 1),
+            order=4
+        )
+        self.assertEqual(sem.season, "تابستان")
+        self.assertEqual(sem.season_and_year, "تابستان ۱۴۰۵")
+        self.assertEqual(sem.season_info["season_code"], "summer")
+
+    def test_none_start_date(self):
+        sem = Semester.objects.create(title="ترم نامشخص", order=5)
+        self.assertEqual(sem.season, "")
+        self.assertEqual(sem.jalali_year, "")
+        self.assertEqual(sem.season_and_year, "")
+        self.assertIsNone(sem.season_info)
+
+
+class SemesterManagementViewsTests(TestCase):
+    """
+    آزمون ویوهای مدیریت ترم: مشاهده لیست، ایجاد ترم جدید، ویرایش و حذف
+    """
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="testadmin", password="password123")
+        self.sem1 = Semester.objects.create(
+            title="ترم ۱ - پاییز ۱۴۰۴",
+            start_date=datetime.date(2025, 9, 23),
+            order=1
+        )
+
+    def test_semester_list_view_public(self):
+        response = self.client.get(reverse("library:semester_list"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "مدیریت ترم‌های تحصیلی")
+        self.assertContains(response, "ترم ۱ - پاییز ۱۴۰۴")
+        self.assertContains(response, "پاییز ۱۴۰۴")
+
+    def test_semester_create_requires_login(self):
+        response = self.client.get(reverse("library:semester_create"))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
+
+    def test_semester_create_post(self):
+        self.client.login(username="testadmin", password="password123")
+        response = self.client.post(reverse("library:semester_create"), {
+            "title": "ترم ۲ - بهمن ۱۴۰۴",
+            "start_date": "2026-02-04",
+            "order": 2,
+            "description": "ترم زمستانه",
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("library:semester_list"))
+
+        new_sem = Semester.objects.get(title="ترم ۲ - بهمن ۱۴۰۴")
+        self.assertEqual(new_sem.start_date, datetime.date(2026, 2, 4))
+        self.assertEqual(new_sem.season_and_year, "زمستان ۱۴۰۴")
+
+    def test_semester_update_post(self):
+        self.client.login(username="testadmin", password="password123")
+        edit_url = reverse("library:semester_edit", kwargs={"pk": self.sem1.pk})
+        response = self.client.post(edit_url, {
+            "title": "ترم ۱ ویرایش شده",
+            "start_date": "2026-07-01", # Change to summer
+            "order": 10,
+            "description": "توضیحات ویرایش‌شده",
+        })
+        self.assertEqual(response.status_code, 302)
+
+        self.sem1.refresh_from_db()
+        self.assertEqual(self.sem1.title, "ترم ۱ ویرایش شده")
+        self.assertEqual(self.sem1.season_and_year, "تابستان ۱۴۰۵")
+
+    def test_semester_delete_post(self):
+        self.client.login(username="testadmin", password="password123")
+        del_url = reverse("library:semester_delete", kwargs={"pk": self.sem1.pk})
+        response = self.client.post(del_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Semester.objects.filter(pk=self.sem1.pk).exists())
+

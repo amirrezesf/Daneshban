@@ -31,7 +31,12 @@
         {% endif %}
         {% if lesson.semester %}
           <span class="sep">·</span>
-          <span>{{ lesson.semester.title }}</span>
+          <span>
+            {{ lesson.semester.title }}
+            {% if lesson.semester.season_and_year %}
+              ({{ lesson.semester.season_and_year }})
+            {% endif %}
+          </span>
         {% endif %}
         <span class="sep">·</span>
         <span style="color: var(--accent); font-weight: 600;">{{ total_resources|persian_digits }} منبع آموزشی ثبت‌شده</span>

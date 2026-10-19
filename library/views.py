@@ -9,7 +9,7 @@ from django.http import FileResponse, Http404, HttpResponse
 from django.core.paginator import Paginator
 from django.urls import reverse
 from .models import Lesson, Resource, Semester
-from .forms import LessonForm, ResourceForm, ResourceEditForm
+from .forms import LessonForm, ResourceForm, ResourceEditForm, SemesterForm
 
 
 def home_view(request):
@@ -351,4 +351,104 @@ def resource_viewer_view(request, pk):
         "text_content": text_content,
     }
     return render(request, "library/resource_viewer.html", context)
+
+
+# =========================================================================
+# بخش مدیریت ترم‌های تحصیلی (Semester Management)
+# =========================================================================
+
+def semester_list_view(request):
+    """
+    صفحه مدیریت و فهرست ترم‌های تحصیلی:
+    - نمایش کلیه ترم‌ها، تاریخ شروع، فصل و سال محاسبه‌شده، و تعداد دروس وابسته
+    - دکمه‌های افزودن، ویرایش و حذف برای کاربران مجاز
+    """
+    semesters = Semester.objects.annotate(
+        lessons_total=Count("lessons")
+    ).order_by("order", "-start_date", "-id")
+
+    total_lessons_assigned = sum(s.lessons_total for s in semesters)
+
+    context = {
+        "semesters": semesters,
+        "total_semesters": semesters.count(),
+        "total_lessons_assigned": total_lessons_assigned,
+    }
+    return render(request, "library/semester_list.html", context)
+
+
+@login_required
+def semester_create_view(request):
+    """
+    ایجاد ترم جدید همراه با تعیین تاریخ شروع و محاسبه خودکار فصل و سال
+    """
+    if request.method == "POST":
+        form = SemesterForm(request.POST)
+        if form.is_valid():
+            semester = form.save()
+            season_desc = f" ({semester.season_and_year})" if semester.season_and_year else ""
+            messages.success(
+                request,
+                f"ترم «{semester.title}»{season_desc} با موفقیت ثبت شد."
+            )
+            return redirect("library:semester_list")
+    else:
+        form = SemesterForm()
+
+    return render(request, "library/semester_form.html", {
+        "form": form,
+        "title": "افزودن ترم تحصیلی جدید",
+        "is_edit": False,
+    })
+
+
+@login_required
+def semester_update_view(request, pk):
+    """
+    ویرایش اطلاعات ترم تحصیلی و به‌روزرسانی تاریخ شروع
+    """
+    semester = get_object_or_404(Semester, pk=pk)
+    if request.method == "POST":
+        form = SemesterForm(request.POST, instance=semester)
+        if form.is_valid():
+            updated = form.save()
+            season_desc = f" ({updated.season_and_year})" if updated.season_and_year else ""
+            messages.success(
+                request,
+                f"اطلاعات ترم «{updated.title}»{season_desc} با موفقیت به‌روزرسانی شد."
+            )
+            return redirect("library:semester_list")
+    else:
+        form = SemesterForm(instance=semester)
+
+    return render(request, "library/semester_form.html", {
+        "form": form,
+        "semester": semester,
+        "title": f"ویرایش ترم: {semester.title}",
+        "is_edit": True,
+    })
+
+
+@login_required
+def semester_delete_view(request, pk):
+    """
+    حذف ترم تحصیلی با ارائه پیام هشدار در صورت انتساب دروس به آن
+    """
+    semester = get_object_or_404(Semester, pk=pk)
+    lessons_count = semester.lessons.count()
+
+    if request.method == "POST":
+        title = semester.title
+        semester.delete()
+        messages.success(
+            request,
+            f"ترم تحصیلی «{title}» با موفقیت حذف شد."
+        )
+        return redirect("library:semester_list")
+
+    return render(request, "library/semester_confirm_delete.html", {
+        "semester": semester,
+        "lessons_count": lessons_count,
+    })
+
 

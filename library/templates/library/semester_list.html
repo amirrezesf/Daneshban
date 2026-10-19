@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}مدیریت ترم‌های تحصیلی{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">مدیریت ترم‌های تحصیلی</span>
+</nav>
+
+<!-- Header & Action -->
+<header style="display: flex; align-items: flex-start; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; margin-block-end: 2rem;">
+  <div>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-block-end: 0.5rem;">
+      <span class="metric-icon-box" style="width: 38px; height: 38px; border-radius: 10px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </span>
+      <h1 class="lesson-title-large" style="margin-block-end: 0;">مدیریت ترم‌های تحصیلی</h1>
+    </div>
+    <p style="color: var(--text-secondary); font-size: 0.95rem; margin-block-end: 0; max-width: 65ch; line-height: 1.7;">
+      پیکربندی تقویم آموزشی، تفکیک خودکار فصل و سال تحصیلی بر اساس تاریخ شروع، و مدیریت دروس مرتبط با هر نیم‌سال.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+    <a href="{% url 'library:home' %}" class="btn btn-secondary btn-sm" title="بازگشت به فهرست دروس">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      <span>مشاهده دروس</span>
+    </a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'library:semester_create' %}" class="btn btn-primary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>افزودن ترم جدید</span>
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}?next={% url 'library:semester_create' %}" class="btn btn-secondary btn-sm">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        <span>ورود مسئول جهت ایجاد ترم</span>
+      </a>
+    {% endif %}
+  </div>
+</header>
+
+<!-- Metrics Strip -->
+<div class="metrics-strip" style="margin-block-end: 2.25rem;">
+  <div class="metric-item">
+    <div class="metric-icon-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </div>
+    <div>
+      <div class="metric-number">{{ total_semesters|persian_digits }}</div>
+      <div class="metric-label">ترم ثبت‌شده</div>
+    </div>
+  </div>
+
+  <div class="metric-item">
+    <div class="metric-icon-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/>
+        <path d="M6 6h10"/>
+        <path d="M6 10h10"/>
+      </svg>
+    </div>
+    <div>
+      <div class="metric-number">{{ total_lessons_assigned|persian_digits }}</div>
+      <div class="metric-label">درس تخصیص‌یافته</div>
+    </div>
+  </div>
+
+  <div class="metric-item">
+    <div class="metric-icon-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <polyline points="12 6 12 12 14 14"></polyline>
+      </svg>
+    </div>
+    <div>
+      <div class="metric-number" style="font-size: 1.15rem; font-weight: 700; color: var(--accent);">خودکار بر اساس تاریخ</div>
+      <div class="metric-label">تفکیک فصل و سال</div>
+    </div>
+  </div>
+</div>
+
+<!-- Semesters Table -->
+{% if semesters %}
+  <div class="table-container">
+    <table class="data-table" aria-label="جدول فهرست ترم‌های تحصیلی">
+      <thead>
+        <tr>
+          <th scope="col" style="width: 60px; text-align: center;">ترتیب</th>
+          <th scope="col">عنوان ترم</th>
+          <th scope="col">فصل و سال (محاسبه‌شده)</th>
+          <th scope="col">تاریخ شروع ترم</th>
+          <th scope="col" style="text-align: center;">تعداد دروس</th>
+          <th scope="col" style="text-align: center; width: 220px;">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sem in semesters %}
+          <tr>
+            <!-- Order -->
+            <td style="text-align: center; font-weight: 700; color: var(--text-muted);">
+              {{ sem.order|persian_digits }}
+            </td>
+
+            <!-- Title & Description -->
+            <td>
+              <div style="font-weight: 600; font-size: 1rem; color: var(--text-primary); margin-block-end: 0.2rem;">
+                <a href="{% url 'library:home' %}?semester={{ sem.id }}" style="color: inherit; text-decoration: none;" title="مشاهده دروس این ترم">
+                  {{ sem.title }}
+                </a>
+              </div>
+              {% if sem.description %}
+                <div style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5; max-width: 45ch;">
+                  {{ sem.description }}
+                </div>
+              {% endif %}
+            </td>
+
+            <!-- Season and Year Badge -->
+            <td>
+              {% if sem.season_info %}
+                <span class="badge-season badge-season-{{ sem.season_info.season_code }}" title="محاسبه‌شده بر اساس تاریخ شروع: {{ sem.season_info.j_date_str }}">
+                  <span>{{ sem.season_info.icon }}</span>
+                  <span>{{ sem.season_info.label }}</span>
+                </span>
+              {% else %}
+                <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">
+                  تاریخ شروع تعیین نشده
+                </span>
+              {% endif %}
+            </td>
+
+            <!-- Start Date -->
+            <td>
+              {% if sem.start_date %}
+                <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">
+                  {{ sem.season_info.j_date_str }}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); font-family: monospace; direction: ltr; text-align: right;">
+                  {{ sem.start_date|date:"Y-m-d" }}
+                </div>
+              {% else %}
+                <span style="font-size: 0.825rem; color: var(--text-muted);">-</span>
+              {% endif %}
+            </td>
+
+            <!-- Lessons Count -->
+            <td style="text-align: center;">
+              {% if sem.lessons_total > 0 %}
+                <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="btn btn-ghost btn-sm" style="font-weight: 700; color: var(--accent);" title="مشاهده {{ sem.lessons_total|persian_digits }} درس">
+                  {{ sem.lessons_total|persian_digits }} درس
+                </a>
+              {% else %}
+                <span style="font-size: 0.85rem; color: var(--text-muted);">۰ درس</span>
+              {% endif %}
+            </td>
+
+            <!-- Actions -->
+            <td style="text-align: center;">
+              <div style="display: inline-flex; align-items: center; gap: 0.4rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="btn btn-ghost btn-sm" title="مشاهده درس‌های این ترم">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <span>دروس</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                  <a href="{% url 'library:semester_edit' sem.pk %}" class="btn btn-secondary btn-sm" title="ویرایش اطلاعات ترم">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                    <span>ویرایش</span>
+                  </a>
+
+                  <a href="{% url 'library:semester_delete' sem.pk %}" class="btn btn-secondary btn-sm" style="color: var(--danger);" title="حذف ترم">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>حذف</span>
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state">
+    <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg>
+    <h2 class="empty-state-title">هنوز ترم تحصیلی ثبت نشده است</h2>
+    <p class="empty-state-desc">برای دسته‌بندی و زمان‌بندی دروس دانشگاهی، نخستین ترم تحصیلی را تعریف نمایید.</p>
+    {% if user.is_authenticated %}
+      <a href="{% url 'library:semester_create' %}" class="btn btn-primary">
+        + افزودن اولین ترم تحصیلی
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}?next={% url 'library:semester_create' %}" class="btn btn-primary">
+        ورود به سامانه جهت ثبت ترم
+      </a>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

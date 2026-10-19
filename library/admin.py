@@ -6,9 +6,28 @@ from .templatetags.persian_tags import persian_digits, persian_filesize, jalali_
 
 @admin.register(Semester)
 class SemesterAdmin(admin.ModelAdmin):
-    list_display = ("title", "order_display", "lessons_count", "created_at_jalali")
-    search_fields = ("title",)
+    list_display = ("title", "season_year_badge", "start_date_display", "order_display", "lessons_count", "created_at_jalali")
+    search_fields = ("title", "description")
     ordering = ("order", "-id")
+
+    @admin.display(description="فصل و سال")
+    def season_year_badge(self, obj):
+        info = obj.season_info
+        if info:
+            return format_html(
+                '<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:600; background:{}; color:#fff;">{} {}</span>',
+                info["color"],
+                info["icon"],
+                info["label"],
+            )
+        return "-"
+
+    @admin.display(description="تاریخ شروع", ordering="start_date")
+    def start_date_display(self, obj):
+        if obj.start_date:
+            info = obj.season_info
+            return info["j_date_str"] if info else jalali_date(obj.start_date)
+        return "مشخص نشده"
 
     @admin.display(description="ترتیب نمایش", ordering="order")
     def order_display(self, obj):

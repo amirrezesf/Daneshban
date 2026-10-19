@@ -30,19 +30,44 @@ class Command(BaseCommand):
             admin_user.save()
             self.stdout.write(self.style.SUCCESS("کاربر مدیر با نام کاربری admin و رمز admin123 ایجاد شد."))
 
+        import datetime
+
         # ۱. ترم‌های تحصیلی
         sem1, _ = Semester.objects.get_or_create(
             title="ترم ۱ - پاییز ۱۴۰۳",
-            defaults={"order": 1}
+            defaults={
+                "order": 1,
+                "start_date": datetime.date(2024, 9, 22), # ۱ مهر ۱۴۰۳
+                "description": "نیم‌سال اول تحصیلی سال ۱۴۰۳-۱۴۰۴ با تمرکز بر دروس پایه ریاضی و فیزیک",
+            }
         )
+        if not sem1.start_date:
+            sem1.start_date = datetime.date(2024, 9, 22)
+            sem1.save()
+
         sem2, _ = Semester.objects.get_or_create(
             title="ترم ۲ - بهار ۱۴۰۴",
-            defaults={"order": 2}
+            defaults={
+                "order": 2,
+                "start_date": datetime.date(2025, 4, 4), # ۱۶ فروردین ۱۴۰۴
+                "description": "نیم‌سال دوم تحصیلی سال ۱۴۰۳-۱۴۰۴ شامل دروس تخصصی مقدماتی",
+            }
         )
+        if not sem2.start_date:
+            sem2.start_date = datetime.date(2025, 4, 4)
+            sem2.save()
+
         sem3, _ = Semester.objects.get_or_create(
             title="ترم ۳ - پاییز ۱۴۰۴",
-            defaults={"order": 3}
+            defaults={
+                "order": 3,
+                "start_date": datetime.date(2025, 9, 23), # ۱ مهر ۱۴۰۴
+                "description": "نیم‌سال اول تحصیلی سال ۱۴۰۴-۱۴۰۵ شامل دروس پیشرفته و کارگاهی",
+            }
         )
+        if not sem3.start_date:
+            sem3.start_date = datetime.date(2025, 9, 23)
+            sem3.save()
 
         # ۲. دروس دانشگاهی
         l1, _ = Lesson.objects.get_or_create(

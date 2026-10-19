@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load persian_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="breadcrumb" aria-label="مسیر راهنما">
+  <a href="{% url 'library:home' %}">خانه</a>
+  <span class="breadcrumb-sep">/</span>
+  <a href="{% url 'library:semester_list' %}">مدیریت ترم‌ها</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">{{ title }}</span>
+</nav>
+
+<div class="form-card" style="max-width: 680px;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: 1rem;">
+    <h1 class="form-title" style="margin-block-end: 0; border-block-end: none; padding-block-end: 0;">
+      {{ title }}
+    </h1>
+    <a href="{% url 'library:semester_list' %}" class="btn btn-ghost btn-sm" title="بازگشت به فهرست ترم‌ها">
+      بازگشت
+    </a>
+  </div>
+
+  <p style="font-size: 0.9rem; color: var(--text-secondary); margin-block-end: 1.75rem; line-height: 1.6;">
+    با انتخاب یا وارد کردن <strong>تاریخ شروع ترم</strong>، سیستم به صورت هوشمند فصل تحصیلی (بهار، تابستان، پاییز یا زمستان) و سال شمسی مربوطه را محاسبه کرده و برچسب آن را به ترم اختصاص می‌دهد.
+  </p>
+
+  <form method="post" novalidate id="semester-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error" style="margin-block-end: 1.5rem;">
+        {% for error in form.non_field_errors %}
+          <div>{{ error }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- تاریخ شروع ترم (Calculates Season and Year) -->
+    <div class="form-group" style="background-color: var(--bg-muted); padding: 1.25rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-block-end: 1.75rem;">
+      <label for="{{ form.start_date.id_for_label }}" class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-weight: 700; color: var(--text-primary);">
+          📅 تاریخ شروع ترم (تعیین‌کننده فصل و سال)
+        </span>
+        <span style="font-size: 0.75rem; color: var(--accent); font-weight: 500;">
+          محاسبه تقویم شمسی
+        </span>
+      </label>
+
+      {{ form.start_date }}
+
+      {% if form.start_date.errors %}
+        <span class="form-error">{{ form.start_date.errors.0 }}</span>
+      {% endif %}
+
+      <!-- Live Dynamic Season and Year Preview Box -->
+      <div id="live-season-box" class="season-preview-card" style="display: none;">
+        <div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-block-end: 0.25rem;">
+            فصل و سال محاسبه‌شده بر اساس تاریخ شروع:
+          </div>
+          <div id="live-season-badge" class="season-preview-badge">
+            <!-- Populated via JavaScript -->
+          </div>
+        </div>
+        <button type="button" id="btn-use-as-title" class="btn btn-secondary btn-sm" style="font-size: 0.785rem;" title="درج در فیلد عنوان ترم">
+          درج در عنوان ترم
+        </button>
+      </div>
+
+      <!-- Quick Semester Date Presets -->
+      <div style="margin-block-start: 0.85rem;">
+        <div style="font-size: 0.775rem; color: var(--text-muted); margin-block-end: 0.4rem;">
+          انتخاب سریع نیم‌سال‌های متداول:
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-ghost btn-sm quick-date-btn" data-date="2025-09-23" style="font-size: 0.75rem; padding: 0.2rem 0.55rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+            🍂 مهر ۱۴۰۴ (پاییز)
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm quick-date-btn" data-date="2026-02-04" style="font-size: 0.75rem; padding: 0.2rem 0.55rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+            ❄️ بهمن ۱۴۰۴ (زمستان)
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm quick-date-btn" data-date="2026-04-04" style="font-size: 0.75rem; padding: 0.2rem 0.55rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+            🌸 فروردین ۱۴۰۵ (بهار)
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm quick-date-btn" data-date="2026-07-01" style="font-size: 0.75rem; padding: 0.2rem 0.55rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+            ☀️ تیر ۱۴۰۵ (تابستان)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- عنوان ترم -->
+    <div class="form-group">
+      <label for="{{ form.title.id_for_label }}" class="form-label">
+        عنوان ترم <span style="color: var(--danger);">*</span>
+      </label>
+      {{ form.title }}
+      <span class="form-help">
+        نام یا کد رسمی ترم؛ مثلاً: «نیم‌سال اول ۱۴۰۴ - ۱۴۰۵» یا «ترم ۱ - مهر»
+      </span>
+      {% if form.title.errors %}
+        <span class="form-error">{{ form.title.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- ترتیب نمایش -->
+    <div class="form-group">
+      <label for="{{ form.order.id_for_label }}" class="form-label">
+        ترتیب نمایش در فهرست
+      </label>
+      {{ form.order }}
+      <span class="form-help">
+        عدد کمتر در ابتدای لیست ترم‌ها و فیلترها نمایش داده می‌شود (مثلاً ۱، ۲، ۳...)
+      </span>
+      {% if form.order.errors %}
+        <span class="form-error">{{ form.order.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- توضیحات ترم -->
+    <div class="form-group">
+      <label for="{{ form.description.id_for_label }}" class="form-label">
+        توضیحات و تقویم آموزشی (اختیاری)
+      </label>
+      {{ form.description }}
+      <span class="form-help">
+        نکات آموزشی، تاریخ حذف و اضافه، یا بازه برگزاری امتحانات این ترم.
+      </span>
+      {% if form.description.errors %}
+        <span class="form-error">{{ form.description.errors.0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Form Actions -->
+    <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-block-start: 2rem; border-block-start: 1px solid var(--border-subtle); padding-block-start: 1.25rem;">
+      <a href="{% url 'library:semester_list' %}" class="btn btn-secondary">
+        انصراف
+      </a>
+      <button type="submit" class="btn btn-primary">
+        {% if is_edit %}
+          به‌روزرسانی ترم
+        {% else %}
+          ذخیره و ایجاد ترم
+        {% endif %}
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- JavaScript for Live Season and Year Calculation based on Start Date -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const dateInput = document.getElementById('id_start_date');
+  const titleInput = document.getElementById('id_semester_title');
+  const seasonBox = document.getElementById('live-season-box');
+  const seasonBadge = document.getElementById('live-season-badge');
+  const useTitleBtn = document.getElementById('btn-use-as-title');
+  const quickButtons = document.querySelectorAll('.quick-date-btn');
+
+  const faDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  function toPersianDigits(n) {
+    return String(n).replace(/[0-9]/g, function (w) { return faDigits[+w]; });
+  }
+
+  // Algorithm for Gregorian to Jalali conversion
+  function gregorianToJalali(gy, gm, gd) {
+    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let jy;
+    if (gy > 1600) {
+      jy = 979;
+      gy -= 1600;
+    } else {
+      jy = 0;
+      gy -= 621;
+    }
+    const gy2 = (gm > 2) ? (gy + 1) : gy;
+    let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * Math.floor(days / 12053);
+    days %= 12053;
+    jy += 4 * Math.floor(days / 1461);
+    days %= 1461;
+    if (days > 365) {
+      jy += Math.floor((days - 1) / 365);
+      days = (days - 1) % 365;
+    }
+    let jm, jd;
+    if (days < 186) {
+      jm = 1 + Math.floor(days / 31);
+      jd = 1 + (days % 31);
+    } else {
+      jm = 7 + Math.floor((days - 186) / 30);
+      jd = 1 + ((days - 186) % 30);
+    }
+    return { jy: jy, jm: jm, jd: jd };
+  }
+
+  let currentCalculatedSeasonYear = '';
+
+  function calculateSeasonAndYear() {
+    if (!dateInput) return;
+    const val = dateInput.value.trim();
+    if (!val) {
+      seasonBox.style.display = 'none';
+      currentCalculatedSeasonYear = '';
+      return;
+    }
+
+    let jy, jm, jd;
+    const parts = val.split(/[-/]/);
+    if (parts.length === 3) {
+      let y = parseInt(parts[0], 10);
+      let m = parseInt(parts[1], 10);
+      let d = parseInt(parts[2], 10);
+
+      if (y >= 1300 && y <= 1500) {
+        // Direct Shamsi
+        jy = y; jm = m; jd = d;
+      } else if (y > 1900 && y < 2200) {
+        // Gregorian to Jalali
+        const j = gregorianToJalali(y, m, d);
+        jy = j.jy; jm = j.jm; jd = j.jd;
+      }
+    }
+
+    if (jy && jm) {
+      let seasonName = '';
+      let seasonCode = '';
+      let seasonIcon = '';
+
+      if (jm >= 1 && jm <= 3) {
+        seasonName = 'بهار';
+        seasonCode = 'spring';
+        seasonIcon = '🌸';
+      } else if (jm >= 4 && jm <= 6) {
+        seasonName = 'تابستان';
+        seasonCode = 'summer';
+        seasonIcon = '☀️';
+      } else if (jm >= 7 && jm <= 9) {
+        seasonName = 'پاییز';
+        seasonCode = 'autumn';
+        seasonIcon = '🍂';
+      } else {
+        seasonName = 'زمستان';
+        seasonCode = 'winter';
+        seasonIcon = '❄️';
+      }
+
+      const yearFa = toPersianDigits(jy);
+      currentCalculatedSeasonYear = seasonName + ' ' + yearFa;
+
+      seasonBadge.className = 'badge-season badge-season-' + seasonCode + ' season-preview-badge';
+      seasonBadge.innerHTML = '<span>' + seasonIcon + '</span><span>' + currentCalculatedSeasonYear + '</span>';
+      seasonBox.style.display = 'flex';
+    } else {
+      seasonBox.style.display = 'none';
+      currentCalculatedSeasonYear = '';
+    }
+  }
+
+  dateInput.addEventListener('input', calculateSeasonAndYear);
+  dateInput.addEventListener('change', calculateSeasonAndYear);
+
+  // Quick Preset Buttons
+  quickButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const targetDate = btn.getAttribute('data-date');
+      dateInput.value = targetDate;
+      calculateSeasonAndYear();
+      if (!titleInput.value.trim() && currentCalculatedSeasonYear) {
+        titleInput.value = 'ترم ' + currentCalculatedSeasonYear;
+      }
+    });
+  });
+
+  // Use as title button
+  if (useTitleBtn) {
+    useTitleBtn.addEventListener('click', function () {
+      if (currentCalculatedSeasonYear) {
+        if (!titleInput.value.trim() || titleInput.value.startsWith('ترم ')) {
+          titleInput.value = 'ترم ' + currentCalculatedSeasonYear;
+        } else {
+          titleInput.value = titleInput.value.trim() + ' (' + currentCalculatedSeasonYear + ')';
+        }
+      }
+    });
+  }
+
+  // Initial run on page load
+  calculateSeasonAndYear();
+});
+</script>
+{% endblock %}

@@ -67,7 +67,17 @@ class Semester(models.Model):
     title = models.CharField(
         max_length=150,
         verbose_name="عنوان ترم",
-        help_text="مثال: ترم ۱ - پاییز ۱۴۰۴"
+        help_text="مثال: نیم‌سال اول ۱۴۰۴ - ۱۴۰۵"
+    )
+    start_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name="تاریخ شروع ترم",
+        help_text="تاریخ آغاز ترم تحصیلی جهت محاسبه خودکار فصل و سال"
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name="توضیحات یا یادداشت ترم"
     )
     order = models.IntegerField(
         default=0,
@@ -90,6 +100,80 @@ class Semester(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def season_info(self):
+        """
+        محاسبه فصل، سال، رنگ و برچسب ترم بر اساس تاریخ شروع با استفاده از تقویم جلالی
+        """
+        if not self.start_date:
+            return None
+        try:
+            import jdatetime
+            j_date = jdatetime.date.fromgregorian(date=self.start_date)
+            m = j_date.month
+            if 1 <= m <= 3:
+                season_name = "بهار"
+                season_code = "spring"
+                icon = "🌸"
+                color = "#10b981"
+            elif 4 <= m <= 6:
+                season_name = "تابستان"
+                season_code = "summer"
+                icon = "☀️"
+                color = "#f59e0b"
+            elif 7 <= m <= 9:
+                season_name = "پاییز"
+                season_code = "autumn"
+                icon = "🍂"
+                color = "#ea580c"
+            else:
+                season_name = "زمستان"
+                season_code = "winter"
+                icon = "❄️"
+                color = "#2563eb"
+
+            digits_map = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+            year_str = str(j_date.year)
+            year_fa = year_str.translate(digits_map)
+            month_fa = str(m).translate(digits_map)
+            day_fa = str(j_date.day).translate(digits_map)
+            j_date_display = f"{year_fa}/{month_fa.zfill(2)}/{day_fa.zfill(2)}"
+
+            return {
+                "season": season_name,
+                "season_code": season_code,
+                "year": year_str,
+                "year_fa": year_fa,
+                "label": f"{season_name} {year_fa}",
+                "icon": icon,
+                "color": color,
+                "j_date_str": j_date_display,
+                "month_name": j_date.strftime("%B"),
+            }
+        except Exception:
+            return None
+
+    @property
+    def season(self):
+        info = self.season_info
+        return info["season"] if info else ""
+
+    @property
+    def jalali_year(self):
+        info = self.season_info
+        return info["year_fa"] if info else ""
+
+    @property
+    def season_and_year(self):
+        """
+        نمایش خلاصه فصل و سال شمسی محاسبه‌شده (مثلاً: پاییز ۱۴۰۴)
+        """
+        info = self.season_info
+        if info:
+            return info["label"]
+        return ""
+
 
 
 class Lesson(models.Model):
