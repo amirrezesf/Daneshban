@@ -992,6 +992,145 @@ html[data-theme="dark"] .badge-season-winter {
   gap: 0.5rem;
 }
 
+/* --------------------------------------------------------------------------
+   Semesters Table & Compact Action Icon Buttons
+   -------------------------------------------------------------------------- */
+.semesters-table-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  margin-block-end: 2rem;
+}
+
+.semesters-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: start;
+}
+
+.semesters-table th {
+  padding: 0.95rem 1.25rem;
+  background-color: var(--bg-muted);
+  border-block-end: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.semesters-table td {
+  padding: 1rem 1.25rem;
+  border-block-end: 1px solid var(--border-subtle);
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.semesters-table tr:last-child td {
+  border-block-end: none;
+}
+
+.semesters-table tbody tr:hover td {
+  background-color: var(--bg-muted);
+}
+
+/* Order pill */
+.order-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 0.825rem;
+  border: 1px solid var(--border-subtle);
+}
+
+/* Lesson count pill */
+.lesson-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+}
+
+.lesson-count-pill:hover {
+  background-color: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.lesson-count-pill.has-lessons {
+  background-color: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+/* Sleek Icon-Only Action Buttons */
+.action-icon-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.action-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.action-icon-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-xs);
+}
+
+.action-icon-btn-view:hover {
+  border-color: var(--accent-border);
+  background-color: var(--accent-subtle);
+  color: var(--accent);
+}
+
+.action-icon-btn-edit:hover {
+  border-color: var(--border-focus);
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.action-icon-btn-delete:hover {
+  border-color: var(--danger-border);
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+
 
 .file-name-title {
   font-weight: 600;
