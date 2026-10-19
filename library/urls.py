@@ -11,6 +11,7 @@ urlpatterns = [
     path("lesson/<str:slug>/edit/", views.lesson_update_view, name="lesson_edit"),
     path("lesson/<str:slug>/delete/", views.lesson_delete_view, name="lesson_delete"),
     path("resource/create/", views.resource_create_view, name="resource_create"),
+    path("resource/<int:pk>/delete/", views.resource_delete_view, name="resource_delete"),
     path("resource/<int:pk>/edit/", views.resource_update_view, name="resource_edit"),
     path("resource/<int:pk>/download/", views.download_resource_view, name="resource_download"),
     path("resource/<int:pk>/preview/", views.resource_viewer_view, name="resource_viewer"),
