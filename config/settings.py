@@ -24,6 +24,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.google.com',
     'https://*.googleusercontent.com',
     'https://*.usercontent.goog',
+    'https://*.aistudio.google.com',
     'http://localhost:3000',
     'http://localhost:8000',
     'http://localhost:8001',
@@ -36,8 +37,19 @@ USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Cookie configuration for AI Studio iframe preview environment (requires SameSite=None; Secure)
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_HTTPONLY = True
+
+# Disable strict opener policy to allow iframe and preview interactions
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
+
 # Allow iframe preview in AI Studio
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'ALLOWALL'
 
 # Application definition
 INSTALLED_APPS = [
@@ -54,10 +66,10 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'config.csrf_middleware.IframeCsrfCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

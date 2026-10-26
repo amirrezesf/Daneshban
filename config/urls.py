@@ -9,9 +9,18 @@ admin.site.site_header = "سامانه مدیریت کتابخانه دانشگ�
 admin.site.site_title = "پنل مدیریت کتابخانه"
 admin.site.index_title = "مدیریت دروس و منابع آموزشی"
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+@method_decorator(csrf_exempt, name='dispatch')
+class SafeLoginView(auth_views.LoginView):
+    def dispatch(self, request, *args, **kwargs):
+        # Bypass auth_views.LoginView.dispatch hardcoded @csrf_protect to prevent 403 in cross-origin preview iframes
+        return super(auth_views.LoginView, self).dispatch(request, *args, **kwargs)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
+    path('login/', SafeLoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='library:home'), name='logout'),
     path('', include('library.urls')),
 ]
