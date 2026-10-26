@@ -114,9 +114,12 @@ class LessonForm(forms.ModelForm):
 class ResourceForm(forms.ModelForm):
     class Meta:
         model = Resource
-        fields = ["lesson", "title", "kind", "session_number", "file", "description", "tags"]
+        fields = ["lesson", "semester", "title", "kind", "session_number", "file", "description", "tags"]
         widgets = {
             "lesson": forms.Select(attrs={
+                "class": "form-select",
+            }),
+            "semester": forms.Select(attrs={
                 "class": "form-select",
             }),
             "title": forms.TextInput(attrs={
@@ -149,6 +152,13 @@ class ResourceForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["lesson"].required = False
+        self.fields["lesson"].empty_label = "--- بدون درس (منبع مستقل / عمومی دانشگاه) ---"
+        self.fields["semester"].required = False
+        self.fields["semester"].empty_label = "--- بدون ترم (عمومی کلیه ترم‌ها) ---"
+
 
 class ResourceEditForm(forms.ModelForm):
     """
@@ -165,12 +175,21 @@ class ResourceEditForm(forms.ModelForm):
 
     class Meta:
         model = Resource
-        fields = ["lesson", "title", "kind", "session_number", "file", "description", "tags"]
+        fields = ["lesson", "semester", "title", "kind", "session_number", "file", "description", "tags"]
         widgets = {
             "lesson": forms.Select(attrs={"class": "form-select"}),
+            "semester": forms.Select(attrs={"class": "form-select"}),
             "title": forms.TextInput(attrs={"class": "form-input", "dir": "auto"}),
             "kind": forms.Select(attrs={"class": "form-select"}),
             "session_number": forms.NumberInput(attrs={"class": "form-input", "min": "1"}),
             "description": forms.Textarea(attrs={"class": "form-textarea", "rows": 3, "dir": "auto"}),
             "tags": forms.TextInput(attrs={"class": "form-input", "dir": "auto"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["lesson"].required = False
+        self.fields["lesson"].empty_label = "--- بدون درس (منبع مستقل / عمومی دانشگاه) ---"
+        self.fields["semester"].required = False
+        self.fields["semester"].empty_label = "--- بدون ترم (عمومی کلیه ترم‌ها) ---"
+

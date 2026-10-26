@@ -82,11 +82,22 @@
             </td>
 
             <td>
-              <a href="{{ item.lesson.get_absolute_url }}" style="font-weight: 600; color: var(--text-primary);">
-                {{ item.lesson.title }}
-              </a>
-              {% if item.lesson.professor %}
-                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.lesson.professor }}</div>
+              {% if item.lesson %}
+                <a href="{{ item.lesson.get_absolute_url }}" style="font-weight: 600; color: var(--text-primary);">
+                  {{ item.lesson.title }}
+                </a>
+                {% if item.lesson.professor %}
+                  <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.lesson.professor }}</div>
+                {% endif %}
+              {% elif item.semester %}
+                <span class="lesson-count-pill has-lessons" style="font-size: 0.8rem;">
+                  {{ item.semester.title }}
+                </span>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-block-start: 2px;">منبع مستقل ترم</div>
+              {% else %}
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">
+                  عمومی دانشگاه
+                </span>
               {% endif %}
             </td>
 

@@ -8,25 +8,36 @@
 <nav class="breadcrumb" aria-label="مسیر راهنما">
   <a href="{% url 'library:home' %}">خانه</a>
   <span class="breadcrumb-sep">/</span>
-  {% if lesson.semester %}
-    <span>{{ lesson.semester.title }}</span>
+  {% if lesson %}
+    {% if lesson.semester %}
+      <span>{{ lesson.semester.title }}</span>
+      <span class="breadcrumb-sep">/</span>
+    {% endif %}
+    <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
+    <span class="breadcrumb-sep">/</span>
+  {% elif resource.semester %}
+    <span>{{ resource.semester.title }}</span>
     <span class="breadcrumb-sep">/</span>
   {% endif %}
-  <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
-  <span class="breadcrumb-sep">/</span>
   <span class="breadcrumb-current">{{ resource.title }}</span>
 </nav>
 
-<!-- GitLab-Style Blob Viewer Card -->
+<!-- Apple QuickLook Preview Card -->
 <div class="blob-viewer-container">
-  <!-- Blob Header Toolbar -->
+  <!-- macOS Window Header Toolbar -->
   <header class="blob-header">
-    <div class="blob-meta-left">
-      <span class="file-type-badge file-type-{{ resource.file_extension }}">
-        {{ resource.file_extension|default:"file" }}
-      </span>
-      <div>
-        <h1 class="blob-title">{{ resource.title }}</h1>
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <div class="macos-traffic-lights" aria-hidden="true" title="macOS Window Controls">
+        <span class="traffic-dot dot-close"></span>
+        <span class="traffic-dot dot-min"></span>
+        <span class="traffic-dot dot-max"></span>
+      </div>
+      <div class="blob-meta-left">
+        <span class="file-type-badge file-type-{{ resource.file_extension }}">
+          {{ resource.file_extension|default:"file" }}
+        </span>
+        <div>
+          <h1 class="blob-title">{{ resource.title }}</h1>
         <div class="blob-submeta">
           <span>{{ resource.file_size|persian_filesize }}</span>
           <span class="sep">·</span>

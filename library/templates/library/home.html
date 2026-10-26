@@ -17,13 +17,23 @@
     </div>
 
     {% if user.is_authenticated %}
-      <a href="{% url 'library:lesson_create' %}" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        <span>افزودن درس جدید</span>
-      </a>
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+        <a href="{% url 'library:lesson_create' %}" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>افزودن درس جدید</span>
+        </a>
+        <a href="{% url 'library:resource_create' %}" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>بارگذاری منبع جدید</span>
+        </a>
+      </div>
     {% endif %}
   </div>
 
@@ -126,8 +136,18 @@
   </div>
 </form>
 
-<!-- Lessons Grid -->
+<!-- Section 1: Academic Lessons Grid -->
 {% if page_obj.object_list %}
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-block-start: 1rem; margin-block-end: 1.25rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/>
+      </svg>
+      <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">دروس دانشگاهی</h2>
+      <span class="resource-group-count">{{ total_lessons|persian_digits }} درس</span>
+    </div>
+  </div>
+
   <div class="lessons-grid">
     {% for lesson in page_obj.object_list %}
       <article class="lesson-card">
@@ -208,26 +228,171 @@
       {% endif %}
     </nav>
   {% endif %}
+{% endif %}
 
-{% else %}
+<!-- Section 2: Standalone & University General Resources -->
+{% if standalone_resources %}
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-block-start: {% if page_obj.object_list %}3rem{% else %}1rem{% endif %}; margin-block-end: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent);">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+      </svg>
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0;">منابع و فایل‌های مستقل دانشگاه</h2>
+      </div>
+      <span class="resource-group-count">{{ standalone_resources|length|persian_digits }} منبع</span>
+    </div>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'library:resource_create' %}" class="btn btn-secondary btn-sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span>افزودن منبع مستقل</span>
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="semesters-table-card" style="margin-block-end: 2rem;">
+    <table class="resources-table" aria-label="جدول منابع مستقل دانشگاه">
+      <thead>
+        <tr>
+          <th scope="col" style="inline-size: 38%;">عنوان فایل و توضیحات</th>
+          <th scope="col" style="width: 120px;">نوع منبع</th>
+          <th scope="col" style="width: 150px;">ترم / دسترسی</th>
+          <th scope="col" style="width: 100px;">حجم فایل</th>
+          <th scope="col" style="width: 90px;">دانلودها</th>
+          <th scope="col" style="width: 180px; text-align: end;">دریافت و عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in standalone_resources %}
+          <tr>
+            <td>
+              <div class="file-cell">
+                <span class="file-type-badge file-type-{{ item.file_extension }}">
+                  {{ item.file_extension|default:"file" }}
+                </span>
+                <div>
+                  <div class="file-name-title">
+                    <a href="{% url 'library:resource_viewer' item.pk %}" style="color: inherit; text-decoration: none;">
+                      {{ item.title }}
+                    </a>
+                  </div>
+                  {% if item.description %}
+                    <div class="file-desc-sub">{{ item.description }}</div>
+                  {% endif %}
+                  {% if item.tags %}
+                    <div class="tag-list">
+                      {% for tag in item.tags|split_tags %}
+                        <span class="unboxed-tag">#{{ tag }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
+                {{ item.get_kind_display }}
+              </span>
+            </td>
+
+            <td>
+              {% if item.semester %}
+                <a href="{% url 'library:home' %}?semester={{ item.semester.id }}" class="lesson-count-pill has-lessons" style="font-size: 0.8rem; text-decoration: none;" title="مشاهده محتوای این ترم">
+                  {{ item.semester.title }}
+                </a>
+              {% else %}
+                <span style="font-size: 0.825rem; color: var(--text-muted); font-style: italic;">
+                  عمومی دانشگاه
+                </span>
+              {% endif %}
+            </td>
+
+            <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+              {{ item.file_size|persian_filesize }}
+            </td>
+
+            <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+              {{ item.download_count|persian_digits }}
+            </td>
+
+            <td style="text-align: end;">
+              <div class="file-action-buttons" style="justify-content: flex-end;">
+                {% if item.can_preview_in_browser %}
+                  <a href="{% url 'library:resource_viewer' item.pk %}" class="btn btn-secondary btn-sm" title="پیش‌نمایش آنلاین در مرورگر">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    <span>پیش‌نمایش</span>
+                  </a>
+                {% elif item.is_office_file %}
+                  <a href="{% url 'library:resource_viewer' item.pk %}" class="btn btn-secondary btn-sm" title="راهنمای بازکردن در آفیس">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    <span>آفیس</span>
+                  </a>
+                {% endif %}
+
+                <a href="{% url 'library:resource_download' item.pk %}" class="btn btn-primary btn-sm" title="دانلود مستقیم فایل">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>دانلود</span>
+                </a>
+
+                {% if user.is_authenticated %}
+                  <a href="{% url 'library:resource_edit' item.pk %}" class="action-icon-btn action-icon-btn-edit" title="ویرایش منبع" style="width: 30px; height: 30px;" aria-label="ویرایش منبع">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                  </a>
+                  <a href="{% url 'library:resource_delete' item.pk %}" class="action-icon-btn action-icon-btn-delete" title="حذف منبع" style="width: 30px; height: 30px;" aria-label="حذف منبع">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+<!-- Empty State: only when BOTH lessons and standalone resources are empty -->
+{% if not page_obj.object_list and not standalone_resources %}
   <div class="empty-state">
     <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/>
     </svg>
-    <h2 class="empty-state-title">درسی یافت نشد</h2>
+    <h2 class="empty-state-title">موردی یافت نشد</h2>
     <p class="empty-state-desc">
       {% if query or selected_semester %}
-        با فیلترهای اعمال شده هیچ درسی یافت نشد. می‌توانید با کلیک روی دکمه زیر به فهرست کلی بازگردید.
+        با فیلترهای اعمال شده هیچ درس یا منبع مستقلی یافت نشد. می‌توانید با کلیک روی دکمه زیر به فهرست کلی بازگردید.
       {% else %}
-        هنوز درسی در سامانه ثبت نشده است. با ورود به عنوان مدیر، نخستین درس را اضافه کنید.
+        هنوز درس یا منبعی در سامانه ثبت نشده است. با ورود به عنوان مدیر، نخستین مورد را اضافه کنید.
       {% endif %}
     </p>
     {% if query or selected_semester %}
-      <a href="{% url 'library:home' %}" class="btn btn-secondary">نمایش همه دروس</a>
+      <a href="{% url 'library:home' %}" class="btn btn-secondary">نمایش همه دروس و منابع</a>
     {% elif user.is_authenticated %}
       <a href="{% url 'library:lesson_create' %}" class="btn btn-primary">افزودن اولین درس</a>
     {% else %}
-      <a href="{% url 'login' %}" class="btn btn-primary">ورود مسئول و ثبت درس</a>
+      <a href="{% url 'login' %}" class="btn btn-primary">ورود مسئول به سامانه</a>
     {% endif %}
   </div>
 {% endif %}

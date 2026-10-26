@@ -228,6 +228,31 @@ class Command(BaseCommand):
                 "tags": "امتحان, پایان ترم, سوالات",
                 "downloads": 52,
             },
+            # منابع مستقل (بدون درس)
+            {
+                "lesson": None,
+                "semester": sem1,
+                "title": "چارت تحصیلی و تقویم آموزشی نیم‌سال اول",
+                "kind": Resource.KIND_BOOK,
+                "session_number": None,
+                "filename": "academic_calendar_fall_chart.pdf",
+                "content": b"%PDF-1.4 Academic Calendar and Course Catalog Chart",
+                "description": "چارت مصوب، آیین‌نامه ثبت‌نام، تاریخ‌های حذف و اضافه و تقویم امتحانات نیم‌سال اول.",
+                "tags": "چارت, تقویم آموزشی, آیین نامه",
+                "downloads": 48,
+            },
+            {
+                "lesson": None,
+                "semester": None,
+                "title": "شیوه‌نامه جامع نگارش مقالات و گزارش‌های دانشگاهی",
+                "kind": Resource.KIND_HANDOUT,
+                "session_number": None,
+                "filename": "university_writing_guidelines.pdf",
+                "content": b"%PDF-1.4 University Research and Technical Writing Style Guide",
+                "description": "راهنمای قالب‌بندی فونت، ارجاع‌دهی مراجع به سبک IEEE و ساختار استانداردهای فنی.",
+                "tags": "شیوه نامه, نگارش, مقاله, پایان نامه",
+                "downloads": 89,
+            },
         ]
 
         count_created = 0
@@ -236,6 +261,7 @@ class Command(BaseCommand):
             if not Resource.objects.filter(lesson=data["lesson"], title=data["title"]).exists():
                 r = Resource(
                     lesson=data["lesson"],
+                    semester=data.get("semester"),
                     title=data["title"],
                     kind=data["kind"],
                     session_number=data["session_number"],

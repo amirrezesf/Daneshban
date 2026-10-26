@@ -6,8 +6,10 @@
 <nav class="breadcrumb" aria-label="مسیر راهنما">
   <a href="{% url 'library:home' %}">خانه</a>
   <span class="breadcrumb-sep">/</span>
-  <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
-  <span class="breadcrumb-sep">/</span>
+  {% if lesson %}
+    <a href="{{ lesson.get_absolute_url }}">{{ lesson.title }}</a>
+    <span class="breadcrumb-sep">/</span>
+  {% endif %}
   <span class="breadcrumb-current">حذف منبع</span>
 </nav>
 
@@ -15,7 +17,13 @@
   <h1 class="form-title" style="color: var(--danger);">تأیید حذف منبع آموزشی</h1>
 
   <p style="margin-block-end: 1rem; font-size: 1.05rem;">
-    آیا از حذف منبع <strong>«{{ resource.title }}»</strong> مربوط به درس <strong>«{{ lesson.title }}»</strong> اطمینان دارید؟
+    آیا از حذف منبع <strong>«{{ resource.title }}»</strong>
+    {% if lesson %}
+      مربوط به درس <strong>«{{ lesson.title }}»</strong>
+    {% else %}
+      (منبع مستقل دانشگاهی)
+    {% endif %}
+    اطمینان دارید؟
   </p>
 
   <div class="alert alert-warning">
@@ -27,7 +35,7 @@
   <form method="post">
     {% csrf_token %}
     <div class="form-actions" style="justify-content: space-between;">
-      <a href="{{ lesson.get_absolute_url }}" class="btn btn-secondary">انصراف و بازگشت</a>
+      <a href="{% if lesson %}{{ lesson.get_absolute_url }}{% else %}{% url 'library:home' %}{% endif %}" class="btn btn-secondary">انصراف و بازگشت</a>
       <button type="submit" class="btn btn-danger">بله، منبع حذف شود</button>
     </div>
   </form>

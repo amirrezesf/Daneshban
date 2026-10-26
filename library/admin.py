@@ -76,11 +76,22 @@ class LessonAdmin(admin.ModelAdmin):
 
 @admin.register(Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = ("title", "lesson", "kind_badge", "session_display", "size_display", "download_count_display", "uploaded_at_jalali")
-    list_filter = ("kind", "lesson__semester", "lesson")
+    list_display = ("title", "lesson_or_standalone", "semester_display", "kind_badge", "session_display", "size_display", "download_count_display", "uploaded_at_jalali")
+    list_filter = ("kind", "semester", "lesson__semester", "lesson")
     search_fields = ("title", "description", "tags", "lesson__title")
     autocomplete_fields = ("lesson",)
     readonly_fields = ("file_size", "download_count", "uploaded_at")
+
+    @admin.display(description="درس / وابستگی")
+    def lesson_or_standalone(self, obj):
+        if obj.lesson:
+            return obj.lesson.title
+        return format_html('<span style="color:#64748b; font-style:italic;">مستقل / عمومی</span>')
+
+    @admin.display(description="ترم")
+    def semester_display(self, obj):
+        sem = obj.effective_semester
+        return sem.title if sem else "—"
 
     @admin.display(description="نوع", ordering="kind")
     def kind_badge(self, obj):

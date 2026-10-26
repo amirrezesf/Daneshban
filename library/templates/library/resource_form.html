@@ -7,8 +7,10 @@
   <a href="{% url 'library:home' %}">خانه</a>
   <span class="breadcrumb-sep">/</span>
   {% if is_edit %}
-    <a href="{{ resource.lesson.get_absolute_url }}">{{ resource.lesson.title }}</a>
-    <span class="breadcrumb-sep">/</span>
+    {% if resource.lesson %}
+      <a href="{{ resource.lesson.get_absolute_url }}">{{ resource.lesson.title }}</a>
+      <span class="breadcrumb-sep">/</span>
+    {% endif %}
     <span class="breadcrumb-current">ویرایش منبع</span>
   {% else %}
     <span class="breadcrumb-current">بارگذاری منبع جدید</span>
@@ -21,12 +23,24 @@
   <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
 
-    <div class="form-group">
-      <label class="form-label" for="{{ form.lesson.id_for_label }}">درس مربوطه *</label>
-      {{ form.lesson }}
-      {% if form.lesson.errors %}
-        <span class="form-error">{{ form.lesson.errors.0 }}</span>
-      {% endif %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label class="form-label" for="{{ form.lesson.id_for_label }}">درس مربوطه (اختیاری)</label>
+        {{ form.lesson }}
+        {% if form.lesson.errors %}
+          <span class="form-error">{{ form.lesson.errors.0 }}</span>
+        {% endif %}
+        <span class="form-help">در صورت خالی بودن، منبع به صورت مستقل در صفحه اصلی نمایش داده می‌شود.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="{{ form.semester.id_for_label }}">ترم تحصیلی (اختیاری)</label>
+        {{ form.semester }}
+        {% if form.semester.errors %}
+          <span class="form-error">{{ form.semester.errors.0 }}</span>
+        {% endif %}
+        <span class="form-help">برای انتساب منبع مستقل به یک ترم یا دوره مشخص (اختیاری).</span>
+      </div>
     </div>
 
     <div class="form-group">
@@ -35,7 +49,7 @@
       {% if form.title.errors %}
         <span class="form-error">{{ form.title.errors.0 }}</span>
       {% endif %}
-      <span class="form-help">مثال: «جزوه کامل فصل ۳ - مشتق و کاربردها»</span>
+      <span class="form-help">مثال: «جزوه کامل فصل ۳ - مشتق» یا «کتاب مرجع یادگیری ماشین»</span>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -93,7 +107,7 @@
 
     <div class="form-actions">
       {% if is_edit %}
-        <a href="{{ resource.lesson.get_absolute_url }}" class="btn btn-secondary">انصراف</a>
+        <a href="{% if resource.lesson %}{{ resource.lesson.get_absolute_url }}{% else %}{% url 'library:home' %}{% endif %}" class="btn btn-secondary">انصراف</a>
       {% else %}
         <a href="{% url 'library:home' %}" class="btn btn-secondary">انصراف</a>
       {% endif %}

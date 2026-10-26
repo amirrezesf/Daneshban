@@ -272,9 +272,21 @@ class Resource(models.Model):
 
     lesson = models.ForeignKey(
         Lesson,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="resources",
-        verbose_name="درس مربوطه"
+        verbose_name="درس مربوطه",
+        help_text="درس مربوطه (اختیاری؛ در صورت خالی بودن، منبع به صورت مستقل در صفحه اصلی نمایش داده می‌شود)"
+    )
+    semester = models.ForeignKey(
+        Semester,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="standalone_resources",
+        verbose_name="ترم تحصیلی",
+        help_text="ترم تحصیلی مربوطه (اختیاری؛ در صورت انتخاب درس، ترم درس به طور پیش‌فرض لحاظ می‌شود)"
     )
     title = models.CharField(
         max_length=255,
@@ -398,3 +410,20 @@ class Resource(models.Model):
         if ext in {'xls', 'xlsx'}:
             return 'ms-excel'
         return ''
+
+    @property
+    def effective_semester(self):
+        """
+        ترم موثر منبع: اگر به درسی متصل باشد ترم درس، در غیر این صورت ترم مستقیم منبع
+        """
+        if self.lesson and self.lesson.semester:
+            return self.lesson.semester
+        return self.semester
+
+    def get_absolute_url(self):
+        """
+        آدرس دسترسی یا پیش‌نمایش مستقیم منبع
+        """
+        if self.lesson:
+            return self.lesson.get_absolute_url()
+        return reverse("library:resource_viewer", kwargs={"pk": self.pk})

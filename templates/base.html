@@ -36,8 +36,14 @@
   <!-- GitLab-Style Top Bar -->
   <header class="site-header">
     <div class="header-inner" style="padding-inline: 1.25rem;">
-      <!-- Left (Inline-Start in RTL): Sidebar Mobile Toggle & Brand Wordmark -->
-      <div style="display: flex; align-items: center; gap: 0.85rem;">
+      <!-- Left (Inline-Start in RTL): macOS Window Controls, Sidebar Toggle & Brand Wordmark -->
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div class="macos-traffic-lights topbar-traffic-lights" aria-hidden="true" title="macOS Window Controls">
+          <span class="traffic-dot dot-close"></span>
+          <span class="traffic-dot dot-min"></span>
+          <span class="traffic-dot dot-max"></span>
+        </div>
+
         <button type="button" id="mobile-sidebar-toggle" class="btn btn-ghost btn-sm" aria-label="منوی کناری"
           style="display: none;" title="نمایش سایدبار">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -69,8 +75,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input type="search" name="q" class="search-input" placeholder="جستجوی سریع دروس، جزوات، اسلایدها..."
-            style="padding-block: 0.45rem; font-size: 0.85rem;" dir="auto">
+          <input type="search" name="q" class="search-input" placeholder="جستجوی سریع دروس، جزوات، اسلایدها..." dir="auto">
         </form>
       </div>
 

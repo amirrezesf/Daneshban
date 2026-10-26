@@ -14,7 +14,7 @@ from .forms import LessonForm, ResourceForm, ResourceEditForm, SemesterForm
 
 def home_view(request):
     """
-    صفحه اصلی: نمایش کارت‌های دروس دانشگاهی با فیلتر ترم و جستجوی سریع
+    صفحه اصلی: نمایش کارت‌های دروس دانشگاهی و منابع مستقل همراه با فیلتر ترم و جستجو
     """
     query = request.GET.get("q", "").strip()
     semester_id = request.GET.get("semester", "").strip()
@@ -23,15 +23,26 @@ def home_view(request):
         resources_total=Count("resources")
     ).select_related("semester").order_by("-created_at")
 
+    # منابع مستقل و عمومی (منابعی که درس مشخصی ندارند)
+    standalone_resources = Resource.objects.filter(
+        lesson__isnull=True
+    ).select_related("semester").order_by("-uploaded_at")
+
     if query:
         lessons = lessons.filter(
             Q(title__icontains=query) |
             Q(professor__icontains=query) |
             Q(description__icontains=query)
         )
+        standalone_resources = standalone_resources.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(tags__icontains=query)
+        )
 
     if semester_id and semester_id.isdigit():
         lessons = lessons.filter(semester_id=int(semester_id))
+        standalone_resources = standalone_resources.filter(semester_id=int(semester_id))
 
     from django.db.models import Sum
 
@@ -41,13 +52,15 @@ def home_view(request):
     total_resources_all = Resource.objects.count()
     total_downloads_all = Resource.objects.aggregate(total=Sum("download_count"))["total"] or 0
 
-    # صفحه‌بندی (۱۲ درس در هر صفحه)
+    # صفحه‌بندی دروس (۱۲ درس در هر صفحه)
     paginator = Paginator(lessons, 12)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
     context = {
         "page_obj": page_obj,
+        "standalone_resources": standalone_resources,
+        "total_standalone": standalone_resources.count(),
         "semesters": semesters,
         "selected_semester": semester_id,
         "query": query,
@@ -140,7 +153,9 @@ def download_resource_view(request, pk):
             request,
             f"متأسفانه فایل منبع «{resource.title}» بر روی سرور یافت نشد. لطفاً با مدیر سامانه تماس بگیرید."
         )
-        return redirect(resource.lesson.get_absolute_url())
+        if resource.lesson:
+            return redirect(resource.lesson.get_absolute_url())
+        return redirect("library:home")
 
     # افزایش شمارنده دانلود
     Resource.objects.filter(pk=pk).update(download_count=resource.download_count + 1)
@@ -228,19 +243,29 @@ def lesson_delete_view(request, slug):
 @login_required
 def resource_create_view(request):
     lesson_id = request.GET.get("lesson")
+    semester_id = request.GET.get("semester")
     initial = {}
     if lesson_id and lesson_id.isdigit():
         initial["lesson"] = int(lesson_id)
+    if semester_id and semester_id.isdigit():
+        initial["semester"] = int(semester_id)
 
     if request.method == "POST":
         form = ResourceForm(request.POST, request.FILES)
         if form.is_valid():
             resource = form.save()
-            messages.success(
-                request,
-                f"منبع «{resource.title}» با موفقیت برای درس «{resource.lesson.title}» بارگذاری شد."
-            )
-            return redirect(resource.lesson.get_absolute_url())
+            if resource.lesson:
+                messages.success(
+                    request,
+                    f"منبع «{resource.title}» با موفقیت برای درس «{resource.lesson.title}» بارگذاری شد."
+                )
+                return redirect(resource.lesson.get_absolute_url())
+            else:
+                messages.success(
+                    request,
+                    f"منبع مستقل «{resource.title}» با موفقیت بارگذاری شد و در صفحه اصلی قرار گرفت."
+                )
+                return redirect("library:home")
     else:
         form = ResourceForm(initial=initial)
 
@@ -259,7 +284,9 @@ def resource_update_view(request, pk):
         if form.is_valid():
             updated = form.save()
             messages.success(request, f"منبع «{updated.title}» با موفقیت به‌روزرسانی شد.")
-            return redirect(updated.lesson.get_absolute_url())
+            if updated.lesson:
+                return redirect(updated.lesson.get_absolute_url())
+            return redirect("library:home")
     else:
         form = ResourceEditForm(instance=resource)
 
@@ -279,7 +306,9 @@ def resource_delete_view(request, pk):
         title = resource.title
         resource.delete()
         messages.success(request, f"منبع «{title}» با موفقیت حذف شد.")
-        return redirect(lesson.get_absolute_url())
+        if lesson:
+            return redirect(lesson.get_absolute_url())
+        return redirect("library:home")
 
     return render(request, "library/resource_confirm_delete.html", {
         "resource": resource,
@@ -329,7 +358,7 @@ def resource_viewer_view(request, pk):
     - پیش‌نمایش درون‌مرورگری برای PDF، تصویر، ویدیو، صوت و متون
     - دکمه اتصال و بازگشایی در برنامه‌های ثالث (Google Docs Viewer، Office Apps و ...) برای سایر فرمت‌ها
     """
-    resource = get_object_or_404(Resource.objects.select_related("lesson", "lesson__semester"), pk=pk)
+    resource = get_object_or_404(Resource.objects.select_related("lesson", "lesson__semester", "semester"), pk=pk)
     
     text_content = ""
     if resource.preview_type == "text" and resource.file and resource.file.storage.exists(resource.file.name):
