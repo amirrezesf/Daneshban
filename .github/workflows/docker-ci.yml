@@ -1,6 +1,6 @@
 # Docker CI/CD Pipeline
 # 
-# This workflow builds and pushes a multi-arch Docker image to GitHub Container Registry (ghcr.io)
+# This workflow builds and pushes a Docker image to GitHub Container Registry (ghcr.io)
 # on every push to main, and on tags matching v*.
 # 
 # Required secrets (add in GitHub repo settings > Secrets and variables > Actions):
@@ -37,18 +37,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install Node dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Run TypeScript type check
-        run: npm run lint
 
       - name: Set up Python
         uses: actions/setup-python@v5

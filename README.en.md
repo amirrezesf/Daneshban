@@ -30,7 +30,7 @@ A web-based system built on Python and Django framework for managing, categorizi
 - **Standard Persian filename downloads:** Full RFC 5987 support (`filename*=UTF-8''...`).
 - **Upload validation:** Size limit (default 100MB) and allowed extensions (PDF, Office, archives, images, text).
 - **Django Admin Panel:** Fully Persian/RTL for granular system management.
-- **Docker Support:** Multi-stage Docker image for easy production deployment.
+- **Docker Support:** Docker image for easy production deployment.
 
 ---
 
@@ -325,8 +325,8 @@ docker exec -it daneshban python manage.py test
 
 This project uses GitHub Actions for CI/CD:
 
-- **`.github/workflows/docker-ci.yml`** — Runs on every push/PR: TypeScript type-check, Django system checks, Docker build & test
-- **`.github/workflows/release.yml`** — Triggered on version tags (`v*`): Generates changelog from conventional commits, creates GitHub Release, builds & pushes multi-arch Docker image to `ghcr.io`
+- **`.github/workflows/docker-ci.yml`** — Runs on every push/PR: Django system checks, Docker build & test
+- **`.github/workflows/release.yml`** — Triggered on version tags (`v*`): Generates changelog from conventional commits, creates GitHub Release, builds & pushes Docker image to `ghcr.io`
 
 ### Commit Convention (for changelog)
 Use [Conventional Commits](https://www.conventionalcommits.org/):

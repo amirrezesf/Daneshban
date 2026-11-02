@@ -1,19 +1,5 @@
-# Multi-stage build for Django + React (Vite) application
-# Stage 1: Build frontend
-FROM node:22-alpine AS frontend-builder
-
-WORKDIR /app
-
-# Install dependencies
-COPY package*.json ./
-RUN npm install --legacy-peer-deps
-
-# Copy source and build
-COPY . .
-RUN npm run build
-
-# Stage 2: Python backend with frontend assets
-FROM python:3.12-slim AS backend
+# Single-stage build for Django application
+FROM python:3.12-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -38,10 +24,6 @@ COPY templates/ ./templates/
 COPY static/ ./static/
 COPY manage.py .
 COPY .env.example .env.example
-
-# Copy built frontend assets from frontend-builder
-COPY --from=frontend-builder /app/dist ./dist/
-COPY --from=frontend-builder /app/static ./static/
 
 # Create staticfiles directory and collect static
 RUN mkdir -p staticfiles media && \

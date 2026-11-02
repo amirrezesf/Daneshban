@@ -30,7 +30,7 @@
 - **دانلود استاندارد با نام‌های فارسی:** پشتیبانی کامل از استاندارد RFC 5987 (`filename*=UTF-8''...`).
 - **اعتبارسنجی آپلود:** محدودیت حجم (پیش‌فرض ۱۰۰ مگابایت) و کنترل پسوندهای مجاز (PDF، Office، فشرده، تصاویر و متن).
 - **پنل مدیریت جنگو:** کاملاً فارسی و راست‌به‌چپ برای مدیریت جزئی‌ترین بخش‌های سامانه.
-- **پشتیبانی از Docker:** ساخت ایمیج چندمرحله‌ای (Multi-stage) برای استقرار آسان در Production.
+- **پشتیبانی از Docker:** ساخت ایمیج برای استقرار آسان در Production.
 
 ---
 
@@ -336,8 +336,8 @@ docker exec -it daneshban python manage.py test
 
 این پروژه از GitHub Actions برای CI/CD استفاده می‌کند:
 
-- **`.github/workflows/docker-ci.yml`** — در هر push/PR اجرا می‌شود: بررسی نوع TypeScript، چک‌های سیستمی جنگو، ساخت و تست Docker
-- **`.github/workflows/release.yml`** — در تگ‌های نسخه (`v*`) فعال می‌شود: تولید changelog از conventional commits، ایجاد GitHub Release، ساخت و_push_ ایمیج چندمعماری Docker به `ghcr.io`
+- **`.github/workflows/docker-ci.yml`** — در هر push/PR اجرا می‌شود: چک‌های سیستمی جنگو، ساخت و تست Docker
+- **`.github/workflows/release.yml`** — در تگ‌های نسخه (`v*`) فعال می‌شود: تولید changelog از conventional commits، ایجاد GitHub Release، ساخت و_push_ ایمیج Docker به `ghcr.io`
 
 ### قرارداد کامیت (برای changelog)
 از [Conventional Commits](https://www.conventionalcommits.org/) استفاده کنید:
