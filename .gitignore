@@ -6,6 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+.idea/
 
 # Python & Django
 .venv/
@@ -18,4 +19,3 @@ db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
-
