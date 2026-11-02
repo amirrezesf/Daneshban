@@ -137,7 +137,7 @@ class ResourceForm(forms.ModelForm):
             }),
             "file": forms.FileInput(attrs={
                 "class": "form-input",
-                "accept": ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.zip,.rar,.7z,.png,.jpg,.jpeg",
+                "accept": ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.zip,.rar,.7z,.png,.jpg,.jpeg,.mp4,.mp3,.m4a,.wav,.ogg,.webm,audio/*,video/*",
             }),
             "description": forms.Textarea(attrs={
                 "class": "form-textarea",
@@ -168,7 +168,7 @@ class ResourceEditForm(forms.ModelForm):
         required=False,
         widget=forms.FileInput(attrs={
             "class": "form-input",
-            "accept": ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.zip,.rar,.7z,.png,.jpg,.jpeg",
+            "accept": ".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.md,.zip,.rar,.7z,.png,.jpg,.jpeg,.mp4,.mp3,.m4a,.wav,.ogg,.webm,audio/*,video/*",
         }),
         label="تغییر فایل (اختیاری)"
     )

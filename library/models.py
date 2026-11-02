@@ -9,7 +9,8 @@ from django.urls import reverse
 
 ALLOWED_EXTENSIONS = {
     'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx',
-    'txt', 'md', 'zip', 'rar', '7z', 'png', 'jpg', 'jpeg'
+    'txt', 'md', 'zip', 'rar', '7z', 'png', 'jpg', 'jpeg',
+    'mp4', 'mp3', 'm4a', 'wav', 'ogg', 'webm'
 }
 
 
@@ -259,6 +260,7 @@ class Resource(models.Model):
     KIND_ASSIGNMENT = "assignment"
     KIND_EXAM = "exam"
     KIND_BOOK = "book"
+    KIND_RECORDING = "recording"
     KIND_OTHER = "other"
 
     KIND_CHOICES = [
@@ -267,6 +269,7 @@ class Resource(models.Model):
         (KIND_ASSIGNMENT, "تمرین"),
         (KIND_EXAM, "نمونه سوال"),
         (KIND_BOOK, "کتاب"),
+        (KIND_RECORDING, "صوت یا ویدیو جلسه"),
         (KIND_OTHER, "سایر"),
     ]
 
@@ -360,7 +363,7 @@ class Resource(models.Model):
         آیا این فرمت مستقیماً در مرورگر قابل مشاهده است (PDF، تصویر، ویدیو، صوت، متن)
         """
         return self.file_extension in {
-            'pdf', 'png', 'jpg', 'jpeg', 'webp', 'mp4', 'webm', 'mp3', 'wav', 'ogg', 'txt', 'md'
+            'pdf', 'png', 'jpg', 'jpeg', 'webp', 'mp4', 'webm', 'm4v', 'mp3', 'wav', 'ogg', 'm4a', 'txt', 'md'
         }
 
     @property
@@ -373,9 +376,9 @@ class Resource(models.Model):
             return 'pdf'
         if ext in {'png', 'jpg', 'jpeg', 'webp', 'svg'}:
             return 'image'
-        if ext in {'mp4', 'webm'}:
+        if ext in {'mp4', 'webm', 'm4v'}:
             return 'video'
-        if ext in {'mp3', 'wav', 'ogg'}:
+        if ext in {'mp3', 'wav', 'ogg', 'm4a'}:
             return 'audio'
         if ext in {'txt', 'md'}:
             return 'text'

@@ -106,27 +106,90 @@
       </div>
 
     {% elif resource.preview_type == 'video' %}
-      <!-- Video In-Browser Preview -->
+      <!-- Video In-Browser Preview (Apple QuickLook Video Player) -->
       <div class="preview-stage-media">
-        <video controls class="preview-video-element">
-          <source src="{% url 'library:resource_raw_stream' resource.id %}">
-          مرورگر شما از پخش مستقیم این ویدیو پشتیبانی نمی‌کند.
-        </video>
+        <div class="media-player-wrapper">
+          <video id="media-video-element" controls playsinline preload="metadata" class="preview-video-element">
+            <source src="{% url 'library:resource_raw_stream' resource.id %}" type="video/{{ resource.file_extension|default:'mp4' }}">
+            مرورگر شما از پخش مستقیم این ویدیو پشتیبانی نمی‌کند.
+          </video>
+          <div class="media-speed-bar">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="media-speed-label">سرعت پخش:</span>
+              <div class="media-speed-buttons">
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-video-element', 0.75, this)">0.75x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn active" onclick="setMediaSpeed('media-video-element', 1.0, this)">1x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-video-element', 1.25, this)">1.25x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-video-element', 1.5, this)">1.5x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-video-element', 2.0, this)">2x</button>
+              </div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-xs" onclick="togglePip('media-video-element')" title="تصویر در تصویر (Picture in Picture)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                <rect x="12" y="10" width="8" height="5" rx="1" fill="currentColor"></rect>
+              </svg>
+              <span>تصویر در تصویر</span>
+            </button>
+          </div>
+        </div>
       </div>
 
     {% elif resource.preview_type == 'audio' %}
-      <!-- Audio In-Browser Preview -->
-      <div class="preview-stage-media" style="padding: 3rem 1.5rem; text-align: center;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent); margin-block-end: 1rem;">
-          <path d="M9 18V5l12-2v13"></path>
-          <circle cx="6" cy="18" r="3"></circle>
-          <circle cx="18" cy="16" r="3"></circle>
-        </svg>
-        <p style="margin-block-end: 1rem; font-weight: 500;">پخش فایل صوتی: {{ resource.title }}</p>
-        <audio controls style="width: 100%; max-width: 500px; margin: 0 auto;">
-          <source src="{% url 'library:resource_raw_stream' resource.id %}">
-          مرورگر شما از پخش فایل صوتی پشتیبانی نمی‌کند.
-        </audio>
+      <!-- Audio In-Browser Preview (Apple Podcasts / Music Style) -->
+      <div class="preview-stage-media">
+        <div class="audio-player-card">
+          <div class="audio-artwork-box">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+          </div>
+
+          <div class="audio-details">
+            <span class="file-type-badge file-type-{{ resource.file_extension }}" style="margin-block-end: 0.5rem;">
+              {{ resource.file_extension|upper }}
+            </span>
+            <h2 class="audio-title">{{ resource.title }}</h2>
+            {% if lesson %}
+              <div class="audio-subtitle">{{ lesson.title }}{% if lesson.professor %} · {{ lesson.professor }}{% endif %}</div>
+            {% endif %}
+          </div>
+
+          <audio id="media-audio-element" controls preload="metadata" class="apple-audio-element">
+            <source src="{% url 'library:resource_raw_stream' resource.id %}" type="audio/{{ resource.file_extension|default:'mpeg' }}">
+            مرورگر شما از پخش مستقیم این فایل صوتی پشتیبانی نمی‌کند.
+          </audio>
+
+          <div class="audio-controls-row">
+            <div class="audio-skip-buttons">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="skipAudio(-15)" title="۱۵ ثانیه به عقب">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+                </svg>
+                <span>-۱۵ ثانیه</span>
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="skipAudio(15)" title="۱۵ ثانیه به جلو">
+                <span>+۱۵ ثانیه</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="media-speed-label">سرعت:</span>
+              <div class="media-speed-buttons">
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 0.75, this)">0.75x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn active" onclick="setMediaSpeed('media-audio-element', 1.0, this)">1x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 1.25, this)">1.25x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 1.5, this)">1.5x</button>
+                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 2.0, this)">2x</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     {% elif resource.preview_type == 'text' %}
@@ -253,6 +316,32 @@
       copyText.innerText = "کپی شد!";
       setTimeout(() => { copyText.innerText = original; }, 2000);
     });
+  }
+
+  function setMediaSpeed(elementId, speed, btnElement) {
+    const media = document.getElementById(elementId);
+    if (!media) return;
+    media.playbackRate = speed;
+    if (btnElement && btnElement.parentElement) {
+      btnElement.parentElement.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+    }
+  }
+
+  function skipAudio(seconds) {
+    const audio = document.getElementById('media-audio-element');
+    if (!audio) return;
+    audio.currentTime = Math.max(0, Math.min(audio.duration || Infinity, audio.currentTime + seconds));
+  }
+
+  function togglePip(elementId) {
+    const video = document.getElementById(elementId);
+    if (!video) return;
+    if (document.pictureInPictureElement) {
+      document.exitPictureInPicture().catch(() => {});
+    } else if (video.requestPictureInPicture) {
+      video.requestPictureInPicture().catch(() => {});
+    }
   }
 </script>
 {% endblock %}

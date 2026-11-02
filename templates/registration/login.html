@@ -13,7 +13,9 @@
 
   <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
-    <input type="hidden" name="next" value="{{ next|default:'/library/' }}">
+    {% if next and next != '/library/' and next != '/library' %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
 
     <div class="form-group">
       <label class="form-label" for="id_username">نام کاربری</label>

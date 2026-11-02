@@ -97,6 +97,22 @@
   --transition-normal: 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
   --transition-fast: 0.14s cubic-bezier(0.2, 0.8, 0.2, 1);
   --container-max-width: 1240px;
+
+  /* Apple-Style Custom Scrollbar Tokens (Light Theme) */
+  --scrollbar-track: #e9e9ee;
+  --scrollbar-thumb: #86868b;
+  --scrollbar-thumb-hover: #48484a;
+  --scrollbar-thumb-active: #0071e3;
+  --scrollbar-size: 13px;
+  --scrollbar-size-fine: 8px;
+}
+
+/* Explicit Light Theme override */
+html[data-theme="light"] {
+  --scrollbar-track: #e9e9ee;
+  --scrollbar-thumb: #86868b;
+  --scrollbar-thumb-hover: #48484a;
+  --scrollbar-thumb-active: #0071e3;
 }
 
 /* Apple Dark Theme (True OLED Black Canvas #000000, Inset Zinc Grays #1c1c1e) */
@@ -145,6 +161,14 @@ html[data-theme="dark"] {
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
   --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
   --shadow-lg: 0 20px 48px -8px rgba(0, 0, 0, 0.7);
+
+  color-scheme: dark;
+
+  /* Apple-Style Custom Scrollbar Tokens (Dark Theme) */
+  --scrollbar-track: #1c1c1e;
+  --scrollbar-thumb: #636366;
+  --scrollbar-thumb-hover: #8e8e93;
+  --scrollbar-thumb-active: #2997ff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -193,6 +217,14 @@ html[data-theme="dark"] {
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
     --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
     --shadow-lg: 0 20px 48px -8px rgba(0, 0, 0, 0.7);
+
+    color-scheme: dark;
+
+    /* Apple-Style Custom Scrollbar Tokens (Dark Theme Media) */
+    --scrollbar-track: #1c1c1e;
+    --scrollbar-thumb: #636366;
+    --scrollbar-thumb-hover: #8e8e93;
+    --scrollbar-thumb-active: #2997ff;
   }
 }
 
@@ -209,12 +241,19 @@ html {
   font-family: var(--font-sans);
   background-color: var(--bg-app);
   color: var(--text-primary);
+  color-scheme: light;
   line-height: 1.6;
   direction: rtl;
   font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
 body {
@@ -223,7 +262,109 @@ body {
   flex-direction: column;
   background-color: var(--bg-app);
   color: var(--text-primary);
-  overflow-x: hidden;
+  overflow: visible;
+}
+
+/* --------------------------------------------------------------------------
+   Cross-Browser Custom Themed Scrollbar (Apple HIG macOS & iOS Style)
+   Obeying active light/dark theme with solid high-contrast pill thumbs
+   -------------------------------------------------------------------------- */
+* {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* WebKit & Blink Browsers (Chrome, Edge, Safari, Brave, Opera) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar,
+::-webkit-scrollbar {
+  display: block !important;
+  width: var(--scrollbar-size) !important;
+  height: var(--scrollbar-size) !important;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track) !important;
+  box-shadow: inset 1px 0 0 var(--border-color), inset -1px 0 0 var(--border-color);
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--scrollbar-track) !important;
+  background-clip: padding-box;
+  min-height: 48px;
+  transition: background-color var(--transition-fast);
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover) !important;
+}
+
+html::-webkit-scrollbar-thumb:active,
+body::-webkit-scrollbar-thumb:active,
+*::-webkit-scrollbar-thumb:active,
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active) !important;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner,
+*::-webkit-scrollbar-corner,
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* Inner scrollable surfaces (Sidebar, Code Previews, Tables, Textareas) */
+.sidebar-scrollable,
+.code-view-pre,
+.preview-stage-text,
+.resources-table-wrapper,
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.sidebar-scrollable::-webkit-scrollbar,
+.code-view-pre::-webkit-scrollbar,
+.preview-stage-text::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  width: var(--scrollbar-size-fine);
+  height: var(--scrollbar-size-fine);
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb,
+.code-view-pre::-webkit-scrollbar-thumb,
+.preview-stage-text::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb) !important;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--scrollbar-track) !important;
+  background-clip: padding-box;
+  min-height: 32px;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb:hover,
+.code-view-pre::-webkit-scrollbar-thumb:hover,
+.preview-stage-text::-webkit-scrollbar-thumb:hover,
+textarea::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb:active,
+.code-view-pre::-webkit-scrollbar-thumb:active,
+.preview-stage-text::-webkit-scrollbar-thumb:active,
+textarea::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
 }
 
 a {
@@ -1378,6 +1519,8 @@ html[data-theme="dark"] .alert-warning { color: #ff9f0a; }
    -------------------------------------------------------------------------- */
 .site-footer {
   margin-block-start: auto;
+  flex-shrink: 0;
+  width: 100%;
   background-color: var(--bg-surface);
   border-block-start: 1px solid var(--border-color);
   padding-block: 2rem;
@@ -1578,11 +1721,22 @@ html[data-theme="dark"] .gitlab-sidebar {
   display: none;
 }
 
-.app-content-body {
+/* Main Column & Expanded Main Content (Flutter Expanded / Sticky Footer) */
+.app-main-column {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 4.25rem);
+}
+
+.app-content-body {
+  flex: 1 0 auto;
+  min-width: 0;
   padding-inline: 2.25rem;
-  padding-block: 1.75rem 3.5rem;
+  padding-block: 1.75rem 3rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* --------------------------------------------------------------------------
@@ -1755,6 +1909,117 @@ html[data-theme="dark"] .gitlab-sidebar {
   background-color: var(--bg-surface);
   border-block-start: 1px solid var(--border-color);
 }
+
+/* --------------------------------------------------------------------------
+   QuickLook Media Player Controls (Video & Audio)
+   -------------------------------------------------------------------------- */
+.media-player-wrapper {
+  width: 100%;
+  max-width: 920px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.media-speed-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-lg);
+  flex-wrap: wrap;
+}
+
+.media-speed-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.media-speed-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.media-speed-buttons .speed-btn {
+  font-size: 0.775rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.media-speed-buttons .speed-btn.active {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+
+/* Apple Podcasts / Audio Card */
+.audio-player-card {
+  width: 100%;
+  max-width: 640px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-2xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.audio-artwork-box {
+  width: 90px;
+  height: 90px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(88, 86, 214, 0.15) 0%, rgba(0, 113, 227, 0.15) 100%);
+  border: 1px solid rgba(88, 86, 214, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5856d6;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(88, 86, 214, 0.15);
+}
+
+.audio-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-block-end: 0.35rem;
+}
+
+.audio-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.apple-audio-element {
+  width: 100%;
+  max-width: 520px;
+}
+
+.audio-controls-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.audio-skip-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 
 /* Responsive adjustments */
 @media (max-width: 992px) {

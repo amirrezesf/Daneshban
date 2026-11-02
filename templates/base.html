@@ -12,7 +12,7 @@
   <!-- Standard Favicons -->
 <link rel="icon" type="image/x-icon" href= "{% static "icons/favicon.ico" %}">
 <link rel="icon" type="image/png" sizes="16x16" href="{% static "icons/favicon-16x16.png" %}">
-<link rel="icon" type="image/png" sizes="32x32" href="{% static "icons/favicon-32x32.png"" %}>
+<link rel="icon" type="image/png" sizes="32x32" href="{% static "icons/favicon-32x32.png" %}">
 
 <!-- Apple Touch Icon -->
 <link rel="apple-touch-icon" sizes="180x180" href="{% static "icons/apple-touch-icon.png" %}">
@@ -126,7 +126,7 @@
           </button>
         </form>
         {% else %}
-        <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
+        <a href="{% url 'login' %}{% if request.path and request.path != '/login/' %}?next={{ request.path|urlencode }}{% endif %}" class="btn btn-secondary btn-sm">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
@@ -334,7 +334,7 @@
         </button>
       </footer>
     </aside>
-    <div style="width: 100%;">
+    <div class="app-main-column">
       <!-- Main Content Area -->
       <main id="main-content" class="app-content-body" style="min-height:calc( 100vh - 175px);">
         {% if messages %}

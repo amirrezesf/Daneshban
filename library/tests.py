@@ -312,3 +312,142 @@ class SemesterManagementViewsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Semester.objects.filter(pk=self.sem1.pk).exists())
 
+
+class MediaSupportTests(TestCase):
+    """
+    آزمون پشتیبانی از فایل‌های چندرسانه‌ای (ویدیو mp4 و صوت mp3):
+    - اعتبارسنجی پسوند و آپلود
+    - تعیین دقیق نوع پیش‌نمایش (video و audio)
+    - استریم مستقیم درون‌مرورگری با Content-Type صحیح
+    - نوع منبع recording (صوت یا ویدیو جلسه)
+    """
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="prof_media", password="password123")
+        self.semester = Semester.objects.create(title="ترم بهار ۱۴۰۵", order=1)
+        self.lesson = Lesson.objects.create(
+            title="هوش مصنوعی پیشرفته",
+            semester=self.semester,
+            professor="دکتر رضایی"
+        )
+
+    def test_mp4_extension_validation_and_preview(self):
+        video_content = b"\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00isommp42"
+        mp4_file = SimpleUploadedFile("lecture_session_1.mp4", video_content, content_type="video/mp4")
+        
+        # Should not raise validation error
+        validate_file_extension_and_size(mp4_file)
+
+        resource = Resource.objects.create(
+            lesson=self.lesson,
+            title="ویدیو ضبط شده جلسه اول",
+            kind=Resource.KIND_RECORDING,
+            file=mp4_file,
+            session_number=1
+        )
+
+        self.assertEqual(resource.file_extension, "mp4")
+        self.assertEqual(resource.preview_type, "video")
+        self.assertTrue(resource.can_preview_in_browser)
+        self.assertEqual(resource.get_kind_display(), "صوت یا ویدیو جلسه")
+
+    def test_mp3_extension_validation_and_preview(self):
+        audio_content = b"ID3\x03\x00\x00\x00\x00\x00#dummy mp3 audio payload"
+        mp3_file = SimpleUploadedFile("lecture_audio_note.mp3", audio_content, content_type="audio/mpeg")
+        
+        # Should not raise validation error
+        validate_file_extension_and_size(mp3_file)
+
+        resource = Resource.objects.create(
+            lesson=self.lesson,
+            title="صوت کلاس درس - بخش دوم",
+            kind=Resource.KIND_RECORDING,
+            file=mp3_file,
+            session_number=2
+        )
+
+        self.assertEqual(resource.file_extension, "mp3")
+        self.assertEqual(resource.preview_type, "audio")
+        self.assertTrue(resource.can_preview_in_browser)
+
+    def test_media_viewer_and_stream_views(self):
+        # Create MP4 resource
+        video_content = b"\x00\x00\x00\x18ftypmp42fake-mp4-data"
+        mp4_file = SimpleUploadedFile("sample_clip.mp4", video_content, content_type="video/mp4")
+        res_mp4 = Resource.objects.create(
+            lesson=self.lesson,
+            title="ویدیو آموزشی حل تمرین",
+            kind=Resource.KIND_RECORDING,
+            file=mp4_file
+        )
+
+        # Viewer page contains video element
+        viewer_url = reverse("library:resource_viewer", kwargs={"pk": res_mp4.pk})
+        response = self.client.get(viewer_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="media-video-element"')
+        self.assertContains(response, 'ویدیو آموزشی حل تمرین')
+
+        # Raw stream endpoint returns video/mp4
+        stream_url = reverse("library:resource_raw_stream", kwargs={"pk": res_mp4.pk})
+        stream_resp = self.client.get(stream_url)
+        self.assertEqual(stream_resp.status_code, 200)
+        self.assertEqual(stream_resp["Content-Type"], "video/mp4")
+
+        # Create MP3 resource
+        audio_content = b"ID3fake-mp3-audio-bytes"
+        mp3_file = SimpleUploadedFile("sample_voice.mp3", audio_content, content_type="audio/mpeg")
+        res_mp3 = Resource.objects.create(
+            lesson=self.lesson,
+            title="فایل صوتی پادکست درس",
+            kind=Resource.KIND_RECORDING,
+            file=mp3_file
+        )
+
+        # Viewer page contains audio element
+        audio_resp = self.client.get(reverse("library:resource_viewer", kwargs={"pk": res_mp3.pk}))
+        self.assertEqual(audio_resp.status_code, 200)
+        self.assertContains(audio_resp, 'id="media-audio-element"')
+        self.assertContains(audio_resp, 'فایل صوتی پادکست درس')
+
+        # Raw stream returns audio/mpeg
+        audio_stream = self.client.get(reverse("library:resource_raw_stream", kwargs={"pk": res_mp3.pk}))
+        self.assertEqual(audio_stream.status_code, 200)
+        self.assertEqual(audio_stream["Content-Type"], "audio/mpeg")
+
+
+class LoginRedirectTests(TestCase):
+    """
+    آزمون هدایت صحیح کاربر پس از ورود (عدم مواجهه با خطای 404 یا مسیر نامعتبر /library/)
+    """
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username="prof_test", password="password123")
+
+    def test_login_redirect_default_to_home(self):
+        # When logging in without any next parameter, user should be redirected to '/'
+        response = self.client.post(reverse("login"), {
+            "username": "prof_test",
+            "password": "password123"
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+
+    def test_login_redirect_handles_legacy_library_path(self):
+        # Even if next is sent as '/library/', SafeLoginView should redirect to '/'
+        response = self.client.post(reverse("login"), {
+            "username": "prof_test",
+            "password": "password123",
+            "next": "/library/"
+        })
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+
+    def test_legacy_library_url_redirects_to_home(self):
+        # Direct GET on /library/ should cleanly 302 to '/' rather than 404
+        response = self.client.get("/library/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+
+
+
