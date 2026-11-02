@@ -148,10 +148,10 @@ jobs:
             ### Pull from GitHub Container Registry
             ```bash
             # Latest release
-            docker pull ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }}
+            docker pull ghcr.io/${{ github.repository_owner }}/daneshban:${{ needs.generate-changelog.outputs.version }}
 
             # Or latest tag
-            docker pull ghcr.io/${{ github.repository }}:latest
+            docker pull ghcr.io/${{ github.repository_owner }}/daneshban:latest
             ```
 
             ### Run with Docker Compose (Recommended)
@@ -174,7 +174,7 @@ jobs:
               -e ALLOWED_HOSTS="*" \
               -v $(pwd)/media:/app/media \
               -v $(pwd)/staticfiles:/app/staticfiles \
-              ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }}
+              ghcr.io/${{ github.repository_owner }}/daneshban:${{ needs.generate-changelog.outputs.version }}
             ```
 
             ### Health Check
@@ -194,7 +194,7 @@ jobs:
             ```
 
             ---
-            *Image: ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }} (Digest: ${{ needs.docker.outputs.image-digest }})*
+            *Image: ghcr.io/${{ github.repository_owner }}/daneshban:${{ needs.generate-changelog.outputs.version }} (Digest: ${{ needs.docker.outputs.image-digest }})*
           draft: false
           prerelease: false
           generate_release_notes: false
