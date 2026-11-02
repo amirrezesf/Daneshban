@@ -85,7 +85,9 @@ jobs:
           context: .
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ${{ env.IMAGE_NAME }}:test
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -100,7 +102,7 @@ jobs:
             -e APP_URL=http://localhost:2445 \
             --name test-container \
             -p 2445:2445 \
-            ${{ steps.meta.outputs.tags }}
+            ${{ env.IMAGE_NAME }}:test
 
           # Wait for container to be ready
           for i in {1..30}; do
