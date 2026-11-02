@@ -1,237 +1,43 @@
-# سامانه مدیریت کتابخانه و منابع دانشگاهی (University Library)
+<img src="./banner.png">
 
-سامانه تحت وب بر پایه فریم‌ورک پایتون و جنگو (Django) برای مدیریت، دسته‌بندی و دسترسی آسان به جزوه‌ها، اسلایدها، صورت تمرین‌ها، نمونه سوالات امتحانی و مراجع درسی دانشگاه. این پروژه به‌صورت کاملاً راست‌به‌چپ (RTL)، با فونت وزیرمتن (Vazirmatn) به‌صورت خودمیزبان (Self-hosted) و برون‌خط (Offline)، همراه با تاریخ شمسی و ارقام فارسی طراحی شده است.
+# Daneshban / سامانه مدیریت کتابخانه دانشگاهی
 
----
+**Choose your language / زبان را انتخاب کنید:**
 
-## فهرست مطالب
-1. [ویژگی‌های کلیدی](#ویژگیهای-کلیدی)
-2. [پیش‌نیازها](#پیشنیازها)
-3. [نحوه راه‌اندازی و اجرای پروژه](#نحوه-راهاندازی-و-اجرای-پروژه)
-4. [ایجاد حساب مدیر (Superuser)](#ایجاد-حساب-مدیر-superuser)
-5. [ایجاد داده‌های نمونه (Seed Demo)](#ایجاد-دادههای-نمونه-seed-demo)
-6. [نحوه افزودن دروس و فایل‌ها](#نحوه-افزودن-دروس-و-فایلها)
-7. [تغییر فونت سامانه](#تغییر-فونت-سامانه)
-8. [پشتیبان‌گیری از پایگاه داده و فایل‌ها (Backup)](#پشتیبانگیری-از-پایگاه-داده-و-فایلها-backup)
-9. [نکات استقرار در محیط عملیاتی (Production Deployment)](#نکات-استقرار-در-محیط-عملیاتی-production-deployment)
-10. [اجرای آزمون‌ها (Tests)](#اجرای-آزمونها-tests)
+- 🇮🇷 [فارسی (Persian)](README.fa.md)
+- 🇺🇸 [English](README.en.md)
 
 ---
 
-## ویژگی‌های کلیدی
-- **کاملاً فارسی و راست‌به‌چپ (RTL):** طراحی شده با رعایت ویژگی‌های منطقی مدرن CSS (`margin-inline`، `padding-inline` و ...) بدون وابستگی به CDN خارجی.
-- **فونت وزیرمتن خودمیزبان:** فایل‌های رسمی woff2 درون پوشه `static/fonts/` قرار گرفته و سامانه ۱۰۰٪ به‌صورت آفلاین کار می‌کند.
-- **تقویم شمسی (جلالی):** تمامی تاریخ‌های بارگذاری با ماژول `jdatetime` به شمسی تبدیل و با ارقام فارسی (۰۱۲۳۴۵۶۷۸۹) نمایش داده می‌شوند.
-- **دسته‌بندی خودکار بر اساس نوع فایل:** جزوه‌ها، اسلایدها، تمرین‌ها، نمونه سوال‌ها، کتاب‌ها و سایر منابع.
-- **جستجوی پیشرفته و فیلتر ترم:** جستجو در عنوان فایل، نام درس، نام استاد، سرفصل‌ها و برچسب‌ها.
-- **دانلود استاندارد با نام‌های فارسی:** پشتیبانی کامل از استاندارد RFC 5987 (`filename*=UTF-8''...`).
-- **اعتبارسنجی آپلود:** محدودیت حجم (پیش‌فرض ۱۰۰ مگابایت) و کنترل پسوندهای مجاز (PDF، Office، فشرده، تصاویر و متن).
-- **پنل مدیریت جنگو:** کاملاً فارسی و راست‌به‌چپ برای مدیریت جزئی‌ترین بخش‌های سامانه.
+## Quick Links / لینک‌های سریع
+
+| Persian | English |
+|---------|---------|
+| [راه‌اندازی با Docker](README.fa.md#راهاندازی-با-docker-پیشنهادی-برای-production) | [Docker Setup](README.en.md#docker-setup-recommended-for-production) |
+| [نصب و اجرا](README.fa.md#نحوه-راهاندازی-و-اجرای-پروژه) | [Installation](README.en.md#installation--setup-development) |
+| [ایجاد ادمین](README.fa.md#ایجاد-حساب-مدیر-superuser) | [Create Admin](README.en.md#creating-admin-user-superuser) |
+| [داده‌های نمونه](README.fa.md#ایجاد-دادههای-نمونه-seed-demo) | [Seed Demo](README.en.md#seed-demo-data) |
+| [تست‌ها](README.fa.md#اجرای-آزمونها-tests) | [Tests](README.en.md#running-tests) |
 
 ---
 
-## پیش‌نیازها
-- پایتون ۳.۱۱ یا بالاتر (`python3`)
-- ابزار ساخت محیط مجازی پایتون (`python3-venv`)
-
----
-
-## نحوه راه‌اندازی و اجرای پروژه
-
-برای اجرای پروژه در مسیر کاری مشخص شده، دستور زیر را در خط فرمان وارد نمایید:
+## Docker Quick Start / راه‌اندازی سریع Docker
 
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate && python manage.py runserver
-```
+# Clone & configure
+git clone https://github.com/amirrezesf/Daneshban.git
+cd Daneshban
+cp .env.example .env
+# Edit .env with your SECRET_KEY, ALLOWED_HOSTS
 
-### مراحل راه‌اندازی برای اولین بار (در صورت راه‌اندازی مجدد):
+# Run with Docker Compose (port 2445)
+docker compose up --build -d
 
-۱. ورود به پوشه پروژه:
-```bash
-cd ~/Documents/UniversityLibrary
-```
-
-۲. ایجاد محیط مجازی پایتون:
-```bash
-python3 -m venv .venv
-```
-
-۳. فعال‌سازی محیط مجازی:
-```bash
-source .venv/bin/activate
-```
-
-۴. نصب وابستگی‌های پروژه:
-```bash
-pip install -r requirements.txt
-```
-
-۵. اعمال مایگریشن‌ها و آماده‌سازی دیتابیس SQLite:
-```bash
-python manage.py migrate
-```
-
-۶. اجرای سرور توسعه جنگو:
-```bash
-python manage.py runserver
-```
-
-سامانه در آدرس `http://127.0.0.1:8000/` در دسترس خواهد بود.
-
----
-
-## ایجاد حساب مدیر (Superuser)
-
-برای دسترسی به پنل مدیریت، امکان آپلود، ویرایش و حذف دروس:
-
-```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
-python manage.py createsuperuser
-```
-سپس نام کاربری، ایمیل و گذرواژه دلخواه خود را وارد نمایید. پس از ورود با این حساب، دکمه‌های «درس جدید»، «آپلود منبع»، «ویرایش» و «حذف» در تمامی صفحات فعال خواهند شد.
-
-همچنین پنل ادمین جنگو در آدرس زیر در دسترس است:
-`http://127.0.0.1:8000/admin/`
-
----
-
-## ایجاد داده‌های نمونه (Seed Demo)
-
-برای مشاهده سریع عملکرد سامانه به همراه دروس و فایل‌های نمونه:
-
-```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
-python manage.py seed_demo
-```
-
-این دستور موارد زیر را به طور خودکار ایجاد می‌کند:
-- کاربر مدیر با نام کاربری `admin` و رمز عبور `admin123`
-- ۳ ترم تحصیلی (پاییز ۱۴۰۳، بهار ۱۴۰۴، پاییز ۱۴۰۴)
-- ۳ درس (ریاضی عمومی ۱، مبانی کامپیوتر و برنامه‌نویسی، مدارهای منطقی)
-- ۱۱ منبع آموزشی نمونه شامل جزوه دست‌نویس، اسلاید، صورت تمرین، پروژه فشرده، و نمونه سوالات با پاسخ.
-
-برای پاک‌سازی و ایجاد مجدد داده‌های نمونه:
-```bash
-python manage.py seed_demo --clear
+# Access at http://localhost:2445
 ```
 
 ---
 
-## نحوه افزودن دروس و فایل‌ها
+## License / مجوز
 
-### ۱. افزودن درس جدید:
-- وارد سامانه شوید («ورود مسئول» در هدر صفحه).
-- روی دکمه «درس جدید» کلیک کنید.
-- عنوان درس (الزامی)، استاد، ترم تحصیلی، رنگ شاخص کارت درس و توضیحات را وارد نموده و «ثبت درس جدید» را بزنید.
-- شناسه یکتای پیوند (اسلاگ فارسی) به‌طور خودکار از عنوان درس تولید می‌شود.
-
-### ۲. بارگذاری منابع (جزوه‌ها و اسلایدها):
-- وارد صفحه درس مورد نظر شده و روی «آپلود فایل جدید» کلیک کنید (یا از دکمه «آپلود منبع» در نوار بالای سایت استفاده کنید).
-- عنوان منبع، نوع منبع (جزوه، اسلاید، تمرین، نمونه سوال، کتاب یا سایر)، شماره جلسه (اختیاری) و فایل مورد نظر را انتخاب نمایید.
-- حجم فایل به‌طور خودکار محاسبه و ذخیره می‌گردد.
-
----
-
-## تغییر فونت سامانه
-
-فونت پیش‌فرض سامانه، فونت آزاد و استاندارد **وزیرمتن (Vazirmatn)** در سه وزن ۴۰۰ (معمولی)، ۵۰۰ (متوسط) و ۷۰۰ (بولد) است که درون پوشه زیر قرار دارد:
-`static/fonts/`
-
-در صورت تمایل به تعویض فونت (مثلاً به ساحل، شبنم، صمیم یا ایران‌سنس):
-۱. فایل‌های فونت جدید در قالب `.woff2` را درون پوشه `static/fonts/` کپی کنید.
-۲. در ابتدای فایل `static/css/app.css`، دستورات `@font-face` را با نام فایل‌های جدید به‌روزرسانی کنید:
-```css
-@font-face {
-  font-family: 'MyFont';
-  src: url('/static/fonts/MyFont-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-display: swap;
-}
-```
-۳. مقدار متغیر `--font-sans` را در ریشه CSS تغییر دهید:
-```css
-:root {
-  --font-sans: 'MyFont', Tahoma, sans-serif;
-}
-```
-
----
-
-## پشتیبان‌گیری از پایگاه داده و فایل‌ها (Backup)
-
-کل اطلاعات سامانه درون دو بخش ذخیره می‌شود:
-۱. **پایگاه داده SQLite:** فایل `db.sqlite3` در ریشه پروژه.
-۲. **فایل‌های بارگذاری شده:** پوشه `media/` در ریشه پروژه.
-
-برای تهیه نسخه پشتیبان کافیست این دو مورد را آرشیو کنید:
-
-```bash
-cd ~/Documents/UniversityLibrary
-tar -czvf university_library_backup_$(date +%Y%m%d).tar.gz db.sqlite3 media/
-```
-
-برای بازیابی (Restore) کافیست فایل فشرده بکاپ را استخراج نمایید:
-```bash
-tar -xzvf university_library_backup_YYYYMMDD.tar.gz
-```
-
----
-
-## نکات استقرار در محیط عملیاتی (Production Deployment)
-
-۱. **تنظیمات متغیرهای محیطی:**
-فایل `.env` را در ریشه پروژه بسازید و مقادیر امنیتی را مقداردهی کنید:
-```env
-SECRET_KEY=your-secure-random-secret-key-here
-DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-MAX_UPLOAD_SIZE_MB=100
-```
-
-۲. **جمع‌آوری فایل‌های استاتیک:**
-```bash
-python manage.py collectstatic --noinput
-```
-
-۳. **سرو فایل‌های Media و Static توسط وب‌سرور (مانند Nginx):**
-در محیط عملیاتی نباید فایل‌های آپلودی مستقیماً توسط وب‌سرور داخلی جنگو سرو شوند. نمونه پیکربندی Nginx:
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    client_max_body_size 100M;
-
-    location /static/ {
-        alias /path/to/UniversityLibrary/staticfiles/;
-    }
-
-    location /media/ {
-        alias /path/to/UniversityLibrary/media/;
-    }
-
-    location / {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-۴. **اجرا توسط Gunicorn یا Uvicorn:**
-```bash
-gunicorn config.wsgi:application --bind 127.0.0.1:8000 --workers 3
-```
-
----
-
-## اجرای آزمون‌ها (Tests)
-
-برای اجرای تمامی آزمون‌های خودکار سامانه (تست مدل‌ها، اسلاگ فارسی، اعتبارسنجی آپلود، ویوها، دانلود با RFC 5987، فیلترهای جلالی و راست‌به‌چپ):
-
-```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
-python manage.py test
-```
-تمامی تست‌ها با موفقیت عبور می‌کنند.
+MIT License — see [LICENSE](LICENSE) for details.
