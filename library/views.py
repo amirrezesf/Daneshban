@@ -5,11 +5,18 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, Q
-from django.http import FileResponse, Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.core.paginator import Paginator
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from .models import Lesson, Resource, Semester
 from .forms import LessonForm, ResourceForm, ResourceEditForm, SemesterForm
+
+
+@csrf_exempt
+def health_check(request):
+    """Health check endpoint for Docker health checks and load balancers."""
+    return JsonResponse({"status": "healthy"})
 
 
 def home_view(request):
