@@ -9,8 +9,8 @@ A web-based system built on Python and Django framework for managing, categorizi
 ### Table of Contents
 1. [Key Features](#key-features)
 2. [Prerequisites](#prerequisites)
-3. [Installation & Setup (Development)](#installation--setup-development)
-4. [Docker Setup (Recommended for Production)](#docker-setup-recommended-for-production)
+3. [Install & Run with Docker (Recommended)](#install--run-with-docker-recommended)
+4. [Local Development (Clone & Run from Source)](#local-development-clone--run-from-source)
 5. [Creating Admin User (Superuser)](#creating-admin-user-superuser)
 6. [Seed Demo Data](#seed-demo-data)
 7. [Adding Courses & Files](#adding-courses--files)
@@ -30,94 +30,47 @@ A web-based system built on Python and Django framework for managing, categorizi
 - **Standard Persian filename downloads:** Full RFC 5987 support (`filename*=UTF-8''...`).
 - **Upload validation:** Size limit (default 100MB) and allowed extensions (PDF, Office, archives, images, text).
 - **Django Admin Panel:** Fully Persian/RTL for granular system management.
-- **Docker Support:** Docker image for easy production deployment.
+- **Docker Support:** Pre-built images on GitHub Container Registry.
 
 ---
 
 ### Prerequisites
-- Python 3.11+ (`python3`)
-- Python venv tool (`python3-venv`)
 - **For Docker:** Docker Engine 24+ and Docker Compose v2+
+- **For local development:** Python 3.11+, `python3-venv`
 
 ---
 
-### Installation & Setup (Development)
+### Install & Run with Docker (Recommended)
 
-Quick start:
+This method uses pre-built images from **GitHub Container Registry** — no need to clone the repo or build locally.
+
+#### 1. Prerequisites
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate && python manage.py runserver
+# Docker and Docker Compose installed
+docker --version
+docker compose version
 ```
 
-#### First-time setup steps:
-
-1. Navigate to project directory:
+#### 2. Get Configuration Files
 ```bash
-cd ~/Documents/UniversityLibrary
+# Download .env.example and docker-compose.yml
+curl -O https://raw.githubusercontent.com/amirrezesf/Daneshban/main/.env.example
+curl -O https://raw.githubusercontent.com/amirrezesf/Daneshban/main/docker-compose.yml
+
+# Rename and edit .env
+mv .env.example .env
+# Set SECRET_KEY, ALLOWED_HOSTS, and other variables in .env
 ```
 
-2. Create Python virtual environment:
+#### 3. Run with Docker Compose (Recommended)
 ```bash
-python3 -m venv .venv
+# Start services (image pulled from ghcr.io)
+docker compose up -d
 ```
 
-3. Activate virtual environment:
+#### 4. Run Standalone Container (without docker-compose)
 ```bash
-source .venv/bin/activate
-```
-
-4. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-5. Apply migrations & setup SQLite database:
-```bash
-python manage.py migrate
-```
-
-6. Run Django development server:
-```bash
-python manage.py runserver
-```
-
-Access at `http://127.0.0.1:8000/`
-
----
-
-### Docker Setup (Recommended for Production)
-
-#### Quick start (Docker Compose):
-```bash
-# 1. Copy env file and edit values
-cp .env.example .env
-# Edit .env with your SECRET_KEY, ALLOWED_HOSTS, etc.
-
-# 2. Build and run
-docker compose up --build -d
-```
-
-Then visit `http://localhost:2445`
-
-#### Manual image build:
-```bash
-# Build image
-docker build -t daneshban:latest .
-
-# Run container
-docker run -d \
-  --name daneshban \
-  -p 2445:2445 \
-  -e SECRET_KEY="your-secret-key" \
-  -e DEBUG=False \
-  -e ALLOWED_HOSTS="*" \
-  -v $(pwd)/media:/app/media \
-  -v $(pwd)/staticfiles:/app/staticfiles \
-  daneshban:latest
-```
-
-#### Use pre-built image from GitHub Container Registry:
-```bash
-# Pull latest
+# Pull latest image
 docker pull ghcr.io/amirrezesf/daneshban:latest
 
 # Run
@@ -132,7 +85,41 @@ docker run -d \
   ghcr.io/amirrezesf/daneshban:latest
 ```
 
-> **Note:** For production, always set environment variables in `.env` and use `DEBUG=False`.
+#### 5. Access the System
+Open browser to `http://localhost:2445`
+
+> **Note:** For Production, always set environment variables in `.env` and use `DEBUG=False`. Generate a secure random SECRET_KEY.
+
+---
+
+### Local Development (Clone & Run from Source)
+
+This method is for contributing to the codebase or customizing the application.
+
+```bash
+# 1. Clone repository
+git clone https://github.com/amirrezesf/Daneshban.git
+cd Daneshban
+
+# 2. Create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment
+cp .env.example .env
+# Edit .env with your settings
+
+# 5. Apply migrations
+python manage.py migrate
+
+# 6. Run development server
+python manage.py runserver
+```
+
+Access at `http://127.0.0.1:8000/`
 
 ---
 
@@ -140,19 +127,20 @@ docker run -d \
 
 For admin panel access, upload, edit, and delete permissions:
 
+**Local development:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py createsuperuser
 ```
-
-Enter username, email, and password. After login, "New Course", "Upload Resource", "Edit", and "Delete" buttons will be enabled across all pages.
-
-Django admin also available at: `http://127.0.0.1:8000/admin/`
 
 **With Docker:**
 ```bash
 docker exec -it daneshban python manage.py createsuperuser
 ```
+
+Enter username, email, and password. After login, "New Course", "Upload Resource", "Edit", and "Delete" buttons will be enabled across all pages.
+
+Django admin also available at: `http://127.0.0.1:8000/admin/`
 
 ---
 
@@ -160,9 +148,15 @@ docker exec -it daneshban python manage.py createsuperuser
 
 Quickly populate the system with sample courses and files:
 
+**Local development:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py seed_demo
+```
+
+**With Docker:**
+```bash
+docker exec -it daneshban python manage.py seed_demo
 ```
 
 This creates:
@@ -174,11 +168,6 @@ This creates:
 To clear and re-seed:
 ```bash
 python manage.py seed_demo --clear
-```
-
-**With Docker:**
-```bash
-docker exec -it daneshban python manage.py seed_demo
 ```
 
 ---
@@ -307,17 +296,18 @@ gunicorn config.wsgi:application --bind 127.0.0.1:2445 --workers 3
 
 Run full test suite (models, Persian slugs, upload validation, views, RFC 5987 downloads, Jalali filters, RTL):
 
+**Local development:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py test
 ```
-
-All tests pass.
 
 **With Docker:**
 ```bash
 docker exec -it daneshban python manage.py test
 ```
+
+All tests pass.
 
 ---
 

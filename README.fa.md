@@ -9,8 +9,8 @@
 ### فهرست مطالب
 1. [ویژگی‌های کلیدی](#ویژگیهای-کلیدی)
 2. [پیش‌نیازها](#پیشنیازها)
-3. [نحوه راه‌اندازی و اجرای پروژه](#نحوه-راهاندازی-و-اجرای-پروژه)
-4. [راه‌اندازی با Docker (پیشنهادی برای Production)](#راهاندازی-با-docker-پیشنهادی-برای-production)
+3. [نصب و اجرا با Docker (روش پیشنهادی)](#نصب-و-اجرا-با-docker-روش-پیشنهادی)
+4. [توسعه محلی (Clone و اجرا از سورس)](#توسعه-محلی-clone-و-اجرا-از-سورس)
 5. [ایجاد حساب مدیر (Superuser)](#ایجاد-حساب-مدیر-superuser)
 6. [ایجاد داده‌های نمونه (Seed Demo)](#ایجاد-دادههای-نمونه-seed-demo)
 7. [نحوه افزودن دروس و فایل‌ها](#نحوه-افزودن-دروس-و-فایلها)
@@ -30,98 +30,50 @@
 - **دانلود استاندارد با نام‌های فارسی:** پشتیبانی کامل از استاندارد RFC 5987 (`filename*=UTF-8''...`).
 - **اعتبارسنجی آپلود:** محدودیت حجم (پیش‌فرض ۱۰۰ مگابایت) و کنترل پسوندهای مجاز (PDF، Office، فشرده، تصاویر و متن).
 - **پنل مدیریت جنگو:** کاملاً فارسی و راست‌به‌چپ برای مدیریت جزئی‌ترین بخش‌های سامانه.
-- **پشتیبانی از Docker:** ساخت ایمیج برای استقرار آسان در Production.
+- **پشتیبانی از Docker:** ایمیج‌های از پیش ساخته شده در GitHub Container Registry.
 
 ---
 
 ### پیش‌نیازها
-- پایتون ۳.۱۱ یا بالاتر (`python3`)
-- ابزار ساخت محیط مجازی پایتون (`python3-venv`)
 - **برای Docker:** Docker Engine 24+ و Docker Compose v2+
+- **برای توسعه محلی:** پایتون ۳.۱۱+، `python3-venv`
 
 ---
 
-### نحوه راه‌اندازی و اجرای پروژه ( توسعه / Development)
+### نصب و اجرا با Docker (روش پیشنهادی)
 
-برای اجرای پروژه در مسیر کاری مشخص شده، دستور زیر را در خط فرمان وارد نمایید:
+این روش از ایمیج‌های از پیش ساخته شده در **GitHub Container Registry** استفاده می‌کند و نیاز به کلون کردن پروژه یا ساخت ایمیج محلی ندارد.
 
+#### ۱. پیش‌نیازها
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate && python manage.py runserver
+# Docker و Docker Compose نصب باشند
+docker --version
+docker compose version
 ```
 
-#### مراحل راه‌اندازی برای اولین بار:
-
-۱. ورود به پوشه پروژه:
+#### ۲. دریافت فایل‌های پیکربندی
 ```bash
-cd ~/Documents/UniversityLibrary
+# فایل محیطی نمونه و docker-compose را دریافت کنید
+curl -O https://raw.githubusercontent.com/amirrezesf/Daneshban/main/.env.example
+curl -O https://raw.githubusercontent.com/amirrezesf/Daneshban/main/docker-compose.yml
+
+# فایل .env را ویرایش کنید
+mv .env.example .env
+# SECRET_KEY، ALLOWED_HOSTS و سایر متغیرها را در .env تنظیم کنید
 ```
 
-۲. ایجاد محیط مجازی پایتون:
+#### ۳. اجرای با Docker Compose (پیشنهادی)
 ```bash
-python3 -m venv .venv
+# شروع سرویس‌ها (ایمیج از ghcr.io دریافت می‌شود)
+docker compose up -d
 ```
 
-۳. فعال‌سازی محیط مجازی:
+#### ۴. اجرای کانتینر مستقل (بدون docker-compose)
 ```bash
-source .venv/bin/activate
-```
-
-۴. نصب وابستگی‌های پروژه:
-```bash
-pip install -r requirements.txt
-```
-
-۵. اعمال مایگریشن‌ها و آماده‌سازی دیتابیس SQLite:
-```bash
-python manage.py migrate
-```
-
-۶. اجرای سرور توسعه جنگو:
-```bash
-python manage.py runserver
-```
-
-سامانه در آدرس `http://127.0.0.1:8000/` در دسترس خواهد بود.
-
----
-
-### راه‌اندازی با Docker (پیشنهادی برای Production)
-
-#### روش سریع (Docker Compose):
-```bash
-# 1. کپی فایل محیطی و ویرایش مقادیر
-cp .env.example .env
-# ویرایش .env و تنظیم SECRET_KEY، ALLOWED_HOSTS و ...
-
-# 2. اجرای کامل با Docker Compose
-docker compose up --build -d
-```
-
-سپس در مرورگر به `http://localhost:2445` مراجعه کنید.
-
-#### ساخت ایمیج دستی:
-```bash
-# ساخت ایمیج
-docker build -t daneshban:latest .
-
-# اجرا
-docker run -d \
-  --name daneshban \
-  -p 2445:2445 \
-  -e SECRET_KEY="your-secret-key" \
-  -e DEBUG=False \
-  -e ALLOWED_HOSTS="*" \
-  -v $(pwd)/media:/app/media \
-  -v $(pwd)/staticfiles:/app/staticfiles \
-  daneshban:latest
-```
-
-#### استفاده از ایمیج از GitHub Container Registry:
-```bash
-# Pull latest
+# دریافت آخرین ایمیج
 docker pull ghcr.io/amirrezesf/daneshban:latest
 
-# Run
+# اجرا
 docker run -d \
   --name daneshban \
   -p 2445:2445 \
@@ -133,7 +85,41 @@ docker run -d \
   ghcr.io/amirrezesf/daneshban:latest
 ```
 
-> **نکته:** برای Production حتماً متغیرهای محیطی را در فایل `.env` تنظیم کنید و از `DEBUG=False` استفاده کنید.
+#### ۵. دسترسی به سامانه
+مرورگر را باز کرده و به آدرس `http://localhost:2445` مراجعه کنید.
+
+> **نکته:** برای Production حتماً متغیرهای محیطی را در فایل `.env` تنظیم کنید و از `DEBUG=False` استفاده کنید. SECRET_KEY را با یک مقدار تصادفی و امن پر کنید.
+
+---
+
+### توسعه محلی (Clone و اجرا از سورس)
+
+این روش برای مشارکت در توسعه یا سفارشی‌سازی کد مناسب است.
+
+```bash
+# 1. کلون مخزن
+git clone https://github.com/amirrezesf/Daneshban.git
+cd Daneshban
+
+# 2. ایجاد محیط مجازی
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. نصب وابستگی‌ها
+pip install -r requirements.txt
+
+# 4. تنظیم متغیرهای محیطی
+cp .env.example .env
+# فایل .env را ویرایش کنید
+
+# 5. اعمال مایگریشن‌ها
+python manage.py migrate
+
+# 6. اجرای سرور توسعه
+python manage.py runserver
+```
+
+سامانه در آدرس `http://127.0.0.1:8000/` در دسترس خواهد بود.
 
 ---
 
@@ -141,9 +127,15 @@ docker run -d \
 
 برای دسترسی به پنل مدیریت، امکان آپلود، ویرایش و حذف دروس:
 
+**توسعه محلی:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py createsuperuser
+```
+
+**با Docker:**
+```bash
+docker exec -it daneshban python manage.py createsuperuser
 ```
 
 سپس نام کاربری، ایمیل و گذرواژه دلخواه خود را وارد نمایید. پس از ورود با این حساب، دکمه‌های «درس جدید»، «آپلود منبع»، «ویرایش» و «حذف» در تمامی صفحات فعال خواهند شد.
@@ -151,20 +143,21 @@ python manage.py createsuperuser
 همچنین پنل ادمین جنگو در آدرس زیر در دسترس است:
 `http://127.0.0.1:8000/admin/`
 
-**با Docker:**
-```bash
-docker exec -it daneshban python manage.py createsuperuser
-```
-
 ---
 
 ### ایجاد داده‌های نمونه (Seed Demo)
 
 برای مشاهده سریع عملکرد سامانه به همراه دروس و فایل‌های نمونه:
 
+**توسعه محلی:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py seed_demo
+```
+
+**با Docker:**
+```bash
+docker exec -it daneshban python manage.py seed_demo
 ```
 
 این دستور موارد زیر را به طور خودکار ایجاد می‌کند:
@@ -176,11 +169,6 @@ python manage.py seed_demo
 برای پاک‌سازی و ایجاد مجدد داده‌های نمونه:
 ```bash
 python manage.py seed_demo --clear
-```
-
-**با Docker:**
-```bash
-docker exec -it daneshban python manage.py seed_demo
 ```
 
 ---
@@ -318,17 +306,18 @@ gunicorn config.wsgi:application --bind 127.0.0.1:2445 --workers 3
 
 برای اجرای تمامی آزمون‌های خودکار سامانه (تست مدل‌ها، اسلاگ فارسی، اعتبارسنجی آپلود، ویوها، دانلود با RFC 5987، فیلترهای جلالی و راست‌به‌چپ):
 
+**توسعه محلی:**
 ```bash
-cd ~/Documents/UniversityLibrary && source .venv/bin/activate
+source .venv/bin/activate
 python manage.py test
 ```
-
-تمامی تست‌ها با موفقیت عبور می‌کنند.
 
 **با Docker:**
 ```bash
 docker exec -it daneshban python manage.py test
 ```
+
+تمامی تست‌ها با موفقیت عبور می‌کنند.
 
 ---
 
