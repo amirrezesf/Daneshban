@@ -9,6 +9,24 @@
   <meta name="description"
     content="سامانه دانشگاهی مدیریت و دسترسی به جزوه‌ها، اسلایدها، تمرین‌ها و نمونه سوالات درسی با تقویم شمسی">
   <meta name="font" content="Vazirmatn">
+  <!-- Standard Favicons -->
+<link rel="icon" type="image/x-icon" href= "{% static "icons/favicon.ico" %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static "icons/favicon-16x16.png" %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static "icons/favicon-32x32.png"" %}>
+
+<!-- Apple Touch Icon -->
+<link rel="apple-touch-icon" sizes="180x180" href="{% static "icons/apple-touch-icon.png" %}">
+
+<!-- Android Icons -->
+<link rel="icon" type="image/png" sizes="192x192" href="{% static "icons/android-chrome-192x192.png" %}">
+<link rel="icon" type="image/png" sizes="512x512" href="{% static "icons/android-chrome-512x512.png" %}">
+
+<!-- Web App Manifest -->
+<link rel="manifest" href="{% static "site.webmanifest" %}">
+
+<!-- Theme Color -->
+<meta name="theme-color" content="#5856d6">
+
 
   <!-- Instant Theme & Sidebar State Script (anti-flicker) -->
   <script>
@@ -38,11 +56,6 @@
     <div class="header-inner" style="padding-inline: 1.25rem;">
       <!-- Left (Inline-Start in RTL): macOS Window Controls, Sidebar Toggle & Brand Wordmark -->
       <div style="display: flex; align-items: center; gap: 1rem;">
-        <div class="macos-traffic-lights topbar-traffic-lights" aria-hidden="true" title="macOS Window Controls">
-          <span class="traffic-dot dot-close"></span>
-          <span class="traffic-dot dot-min"></span>
-          <span class="traffic-dot dot-max"></span>
-        </div>
 
         <button type="button" id="mobile-sidebar-toggle" class="btn btn-ghost btn-sm" aria-label="منوی کناری"
           style="display: none;" title="نمایش سایدبار">
@@ -56,12 +69,7 @@
 
         <a href="{% url 'library:home' %}" class="brand-link" title="سامانه کتابخانه دانشگاهی">
           <span class="brand-logo-mark" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20" />
-              <path d="M6 6h10" />
-              <path d="M6 10h10" />
-            </svg>
+          <img src="{% static "icons/logo.svg" %}" style="height:30px"/>
           </span>
           <span>کتابخانه دانشگاهی</span>
         </a>
@@ -328,7 +336,7 @@
     </aside>
     <div style="width: 100%;">
       <!-- Main Content Area -->
-      <main id="main-content" class="app-content-body">
+      <main id="main-content" class="app-content-body" style="min-height:calc( 100vh - 175px);">
         {% if messages %}
         <div class="messages-container" aria-live="polite">
           {% for message in messages %}
