@@ -110,6 +110,10 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "value=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -120,7 +124,7 @@ jobs:
             org.opencontainers.image.title=${{ github.repository }}
             org.opencontainers.image.description=Daneshban - University Library Management System
             org.opencontainers.image.version=${{ needs.generate-changelog.outputs.version }}
-            org.opencontainers.image.created=${{ time.now }}
+            org.opencontainers.image.created=${{ steps.timestamp.outputs.value }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.licenses=MIT
