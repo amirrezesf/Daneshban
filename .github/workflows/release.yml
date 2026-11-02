@@ -22,6 +22,7 @@ jobs:
     outputs:
       changelog: ${{ steps.changelog.outputs.changelog }}
       version: ${{ steps.version.outputs.version }}
+      previous_tag: ${{ steps.prev_tag.outputs.tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,6 +35,15 @@ jobs:
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           VERSION="${TAG#v}"
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Find previous tag
+        id: prev_tag
+        run: |
+          PREV_TAG=$(git tag -l 'v*' --sort=-v:refname | awk 'NR==2 {print $1}')
+          if [ -z "$PREV_TAG" ]; then
+            PREV_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "tag=$PREV_TAG" >> $GITHUB_OUTPUT
 
       - name: Generate changelog from commits
         id: changelog
@@ -56,28 +66,8 @@ jobs:
               "sortBy": "title",
               "maxIssues": 100
             }
-
-  release:
-    name: Create Release
-    needs: generate-changelog
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ needs.generate-changelog.outputs.version }}
-          name: Release v${{ needs.generate-changelog.outputs.version }}
-          body: ${{ needs.generate-changelog.outputs.changelog }}
-          draft: false
-          prerelease: false
-          generate_release_notes: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fromTag: ${{ steps.prev_tag.outputs.tag }}
+          toTag: ${{ github.event.inputs.tag || github.ref_name }}
 
   docker:
     name: Build & Push Docker Image
@@ -86,6 +76,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -115,6 +108,7 @@ jobs:
         run: echo "value=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -130,3 +124,79 @@ jobs:
             org.opencontainers.image.licenses=MIT
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  release:
+    name: Create GitHub Release
+    needs: [generate-changelog, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.generate-changelog.outputs.version }}
+          name: Release v${{ needs.generate-changelog.outputs.version }}
+          body: |
+            ${{ needs.generate-changelog.outputs.changelog }}
+
+            ## 🐳 Docker Installation
+
+            ### Pull from GitHub Container Registry
+            ```bash
+            # Latest release
+            docker pull ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }}
+
+            # Or latest tag
+            docker pull ghcr.io/${{ github.repository }}:latest
+            ```
+
+            ### Run with Docker Compose (Recommended)
+            ```bash
+            # 1. Create environment file
+            cp .env.example .env
+            # Edit .env with your SECRET_KEY, ALLOWED_HOSTS, etc.
+
+            # 2. Start services
+            docker compose up --build -d
+            ```
+
+            ### Run Standalone Container
+            ```bash
+            docker run -d \
+              --name daneshban \
+              -p 2445:2445 \
+              -e SECRET_KEY="your-secret-key" \
+              -e DEBUG=False \
+              -e ALLOWED_HOSTS="*" \
+              -v $(pwd)/media:/app/media \
+              -v $(pwd)/staticfiles:/app/staticfiles \
+              ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }}
+            ```
+
+            ### Health Check
+            ```bash
+            curl http://localhost:2445/health/
+            # Returns: {"status": "healthy"}
+            ```
+
+            ### Admin User
+            ```bash
+            docker exec -it daneshban python manage.py createsuperuser
+            ```
+
+            ### Seed Demo Data
+            ```bash
+            docker exec -it daneshban python manage.py seed_demo
+            ```
+
+            ---
+            *Image: ghcr.io/${{ github.repository }}:${{ needs.generate-changelog.outputs.version }} (Digest: ${{ needs.docker.outputs.image-digest }})*
+          draft: false
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
