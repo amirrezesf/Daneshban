@@ -423,11 +423,26 @@ def semester_create_view(request):
         if form.is_valid():
             semester = form.save()
             season_desc = f" ({semester.season_and_year})" if semester.season_and_year else ""
-            messages.success(
-                request,
-                f"ترم «{semester.title}»{season_desc} با موفقیت ثبت شد."
-            )
+            msg = f"ترم «{semester.title}»{season_desc} با موفقیت ثبت شد."
+            messages.success(request, msg)
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "message": msg,
+                    "id": semester.id,
+                    "title": semester.title,
+                    "start_date": semester.start_date.strftime("%Y-%m-%d") if semester.start_date else "",
+                    "season_label": semester.season_and_year,
+                    "order": semester.order,
+                    "description": semester.description,
+                })
             return redirect("library:semester_list")
+        else:
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": False,
+                    "errors": form.errors.get_json_data(),
+                }, status=400)
     else:
         form = SemesterForm()
 
@@ -442,6 +457,7 @@ def semester_create_view(request):
 def semester_update_view(request, pk):
     """
     ویرایش اطلاعات ترم تحصیلی و به‌روزرسانی تاریخ شروع
+    پشتیبانی همزمان از درخواست‌های معمولی و پاپ‌آپ دیالوگ AJAX
     """
     semester = get_object_or_404(Semester, pk=pk)
     if request.method == "POST":
@@ -449,13 +465,37 @@ def semester_update_view(request, pk):
         if form.is_valid():
             updated = form.save()
             season_desc = f" ({updated.season_and_year})" if updated.season_and_year else ""
-            messages.success(
-                request,
-                f"اطلاعات ترم «{updated.title}»{season_desc} با موفقیت به‌روزرسانی شد."
-            )
+            msg = f"اطلاعات ترم «{updated.title}»{season_desc} با موفقیت به‌روزرسانی شد."
+            messages.success(request, msg)
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": True,
+                    "message": msg,
+                    "id": updated.id,
+                    "title": updated.title,
+                    "start_date": updated.start_date.strftime("%Y-%m-%d") if updated.start_date else "",
+                    "season_label": updated.season_and_year,
+                    "order": updated.order,
+                    "description": updated.description,
+                })
             return redirect("library:semester_list")
+        else:
+            if request.headers.get("x-requested-with") == "XMLHttpRequest":
+                return JsonResponse({
+                    "success": False,
+                    "errors": form.errors.get_json_data(),
+                }, status=400)
     else:
         form = SemesterForm(instance=semester)
+        if request.headers.get("x-requested-with") == "XMLHttpRequest" or request.GET.get("format") == "json":
+            return JsonResponse({
+                "id": semester.id,
+                "title": semester.title,
+                "start_date": semester.start_date.strftime("%Y-%m-%d") if semester.start_date else "",
+                "order": semester.order,
+                "description": semester.description,
+                "season_label": semester.season_and_year,
+            })
 
     return render(request, "library/semester_form.html", {
         "form": form,

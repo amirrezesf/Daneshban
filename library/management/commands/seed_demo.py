@@ -100,7 +100,30 @@ class Command(BaseCommand):
             }
         )
 
+        l4, _ = Lesson.objects.get_or_create(
+            title="هوش مصنوعی و یادگیری ماشین",
+            defaults={
+                "professor": "دکتر آرش سهرابی",
+                "semester": sem3,
+                "color": "#8b5cf6",
+                "description": "عامل‌های هوشمند، جستجوی آگاهانه، الگوریتم‌های ژنتیک، منطق فازی، شبکه‌های عصبی و یادگیری عمیق.",
+            }
+        )
+
+        l5, _ = Lesson.objects.get_or_create(
+            title="طراحی و مدیریت پایگاه داده‌ها",
+            defaults={
+                "professor": "دکتر مریم کریمی",
+                "semester": sem2,
+                "color": "#06b6d4",
+                "description": "مدل موجودیت-ارتباط (ER)، جبر رابطه‌ای، زبان SQL استاندارد، نرمال‌سازی و تراکنش‌های ACID.",
+            }
+        )
+
         # ۳. ایجاد فایل‌ها و منابع نمونه
+        mp3_dummy = (b'\xff\xfb\x90d' + b'\x00' * 413) * 120
+        mp4_dummy = b'\x00\x00\x00\x20ftypisom\x00\x00\x02\x00isomiso2mp41\x00\x00\x00\x08free\x00\x00\x00\x08mdat' + b'\x00' * 2048
+
         sample_resources = [
             # ریاضی عمومی ۱
             {
@@ -227,6 +250,88 @@ class Command(BaseCommand):
                 "description": "نمونه سوالات تحلیلی و طراحی مدارهای ترتیبی همگام و ناهمگام با پاسخ تشریحی.",
                 "tags": "امتحان, پایان ترم, سوالات",
                 "downloads": 52,
+            },
+            # صوت و ویدیوهای جلسات (برای تست پلیر صوتی مایع و ویدیویی)
+            {
+                "lesson": l1,
+                "title": "صوت ضبط‌شده جلسه ۴: قضیه مقدار میانگین و مشتق مراتب بالا",
+                "kind": Resource.KIND_RECORDING,
+                "session_number": 4,
+                "filename": "math1_session4_audio.mp3",
+                "content": mp3_dummy,
+                "description": "فایل صوتی کلاس درس ریاضی عمومی ۱ همراه با توضیحات استاد در خصوص مثال‌های کاربردی قضیه رول و مقدار میانگین.",
+                "tags": "صوت, جلسه چهارم, ضبط کلاس, mp3",
+                "downloads": 42,
+            },
+            {
+                "lesson": l2,
+                "title": "صوت جلسه کارگاه برنامه‌نویسی: ساختمان داده‌های توکار پایتون",
+                "kind": Resource.KIND_RECORDING,
+                "session_number": 5,
+                "filename": "python_session5_structures_audio.mp3",
+                "content": mp3_dummy,
+                "description": "صوت آموزشی نحوه پیمایش تاپل‌ها، دیکشنری‌ها، مجموعه‌ها و مفاهیم پیچیدگی حافظه در پایتون.",
+                "tags": "صوت, پایتون, کارگاه, mp3",
+                "downloads": 67,
+            },
+            {
+                "lesson": l3,
+                "title": "ویدیو آموزشی: کارگاه تحلیل و طراحی مدار در نرم‌افزار Logisim",
+                "kind": Resource.KIND_RECORDING,
+                "session_number": 6,
+                "filename": "logic_circuits_logisim_workshop.mp4",
+                "content": mp4_dummy,
+                "description": "ویدیو نحوه پیاده‌سازی جمع‌کننده ۴ بیتی، فلیپ‌فلاپ‌های نوع D و JK و تست مدار با پالس ساعت.",
+                "tags": "ویدیو, لاجیسیم, مدار, کارگاه, mp4",
+                "downloads": 58,
+            },
+
+            # هوش مصنوعی
+            {
+                "lesson": l4,
+                "title": "اسلایدهای فصل اول: معرفی هوش مصنوعی و عامل‌های عقلانی",
+                "kind": Resource.KIND_SLIDES,
+                "session_number": 1,
+                "filename": "ai_session1_agents.pdf",
+                "content": b"%PDF-1.4 AI Session 1 - Intelligent Agents and Environments",
+                "description": "انواع محیط‌های وظیفه (PEAS)، ساختار عامل‌های واکنشی، مبتنی بر مدل و یادگیرنده.",
+                "tags": "هوش مصنوعی, اسلاید, جلسه اول",
+                "downloads": 39,
+            },
+            {
+                "lesson": l4,
+                "title": "صوت ضبط‌شده جلسه ۶: الگوریتم جستجوی A* و هیوریستیک‌های سازگار",
+                "kind": Resource.KIND_RECORDING,
+                "session_number": 6,
+                "filename": "ai_session6_astar_heuristic.mp3",
+                "content": mp3_dummy,
+                "description": "بررسی شرایط پایداری و بهینگی الگوریتم A*، اثبات admissibility و رسم درخت جستجو.",
+                "tags": "صوت, جستجو, هوش مصنوعی, جلسه ششم, mp3",
+                "downloads": 73,
+            },
+
+            # پایگاه داده‌ها
+            {
+                "lesson": l5,
+                "title": "جزوه مدلسازی داده و دیاگرام ER پیشرفته",
+                "kind": Resource.KIND_HANDOUT,
+                "session_number": 3,
+                "filename": "database_er_diagram_handout.pdf",
+                "content": b"%PDF-1.4 Database Systems - ER Modeling Handout",
+                "description": "انواع موجودیت‌ها، ویژگی‌های چندمقداره و ترکیبی، روابط بازگشتی و تبدیل به جداول رابطه‌ای.",
+                "tags": "پایگاه داده, جزوه, ER",
+                "downloads": 45,
+            },
+            {
+                "lesson": l5,
+                "title": "اسلایدهای دستورات SQL و کوئری‌های تودرتو",
+                "kind": Resource.KIND_SLIDES,
+                "session_number": 7,
+                "filename": "database_sql_queries_slides.pptx",
+                "content": b"Sample PPTX - Advanced SQL Queries and Joins",
+                "description": "بررسی انواع JOIN، GROUP BY، HAVING و Subqueryهای همبسته و غیرهمبسته.",
+                "tags": "SQL, اسلاید, کوئری",
+                "downloads": 61,
             },
             # منابع مستقل (بدون درس)
             {

@@ -38,13 +38,13 @@
       <span>فهرست دروس</span>
     </a>
     {% if user.is_authenticated %}
-      <a href="{% url 'library:semester_create' %}" class="btn btn-primary btn-sm">
+      <button type="button" class="btn btn-primary btn-sm btn-open-create-semester" data-create-url="{% url 'library:semester_create' %}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
         <span>افزودن ترم جدید</span>
-      </a>
+      </button>
     {% else %}
       <a href="{% url 'login' %}?next={% url 'library:semester_create' %}" class="btn btn-secondary btn-sm">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -197,13 +197,22 @@
                 </a>
 
                 {% if user.is_authenticated %}
-                  <!-- Edit Semester Icon Button -->
-                  <a href="{% url 'library:semester_edit' sem.pk %}" class="action-icon-btn action-icon-btn-edit" title="ویرایش اطلاعات ترم" aria-label="ویرایش ترم">
+                  <!-- Edit Semester Icon Button (Opens Popup Dialogue) -->
+                  <button type="button" 
+                    class="action-icon-btn action-icon-btn-edit btn-open-edit-semester" 
+                    title="ویرایش اطلاعات ترم در پنجره پاپ‌آپ" 
+                    aria-label="ویرایش ترم"
+                    data-id="{{ sem.id }}"
+                    data-title="{{ sem.title|escape }}"
+                    data-start-date="{{ sem.start_date|date:'Y-m-d'|default:'' }}"
+                    data-order="{{ sem.order }}"
+                    data-description="{{ sem.description|escape }}"
+                    data-edit-url="{% url 'library:semester_edit' sem.pk %}">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M12 20h9"></path>
                       <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                     </svg>
-                  </a>
+                  </button>
 
                   <!-- Delete Semester Icon Button -->
                   <a href="{% url 'library:semester_delete' sem.pk %}" class="action-icon-btn action-icon-btn-delete" title="حذف ترم" aria-label="حذف ترم">
@@ -231,14 +240,433 @@
     <h2 class="empty-state-title">هنوز ترم تحصیلی ثبت نشده است</h2>
     <p class="empty-state-desc">برای دسته‌بندی و زمان‌بندی دروس دانشگاهی، نخستین ترم تحصیلی را تعریف نمایید.</p>
     {% if user.is_authenticated %}
-      <a href="{% url 'library:semester_create' %}" class="btn btn-primary">
+      <button type="button" class="btn btn-primary btn-open-create-semester" data-create-url="{% url 'library:semester_create' %}">
         + افزودن اولین ترم تحصیلی
-      </a>
+      </button>
     {% else %}
       <a href="{% url 'login' %}?next={% url 'library:semester_create' %}" class="btn btn-primary">
         ورود به سامانه جهت ثبت ترم
       </a>
     {% endif %}
   </div>
+{% endif %}
+
+{% if user.is_authenticated %}
+<!-- Liquid Glass Popup Dialogue for Editing / Creating Semesters -->
+<div class="liquid-modal-backdrop" id="semester-dialog-backdrop" role="dialog" aria-modal="true" aria-labelledby="dialog-semester-title" aria-hidden="true">
+  <div class="liquid-dialog-card lg-glass" onclick="event.stopPropagation()">
+    <!-- Dialogue Header -->
+    <div class="liquid-dialog-header">
+      <div class="liquid-dialog-title-group">
+        <div class="liquid-dialog-icon-box" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+        </div>
+        <div>
+          <h2 class="liquid-dialog-title" id="dialog-semester-title">ویرایش ترم تحصیلی</h2>
+          <div class="liquid-dialog-subtitle" id="dialog-semester-subtitle">پیکربندی زمان‌بندی و مشخصات تقویم تحصیلی</div>
+        </div>
+      </div>
+      <button type="button" class="liquid-dialog-close-btn" id="dialog-close-btn" aria-label="بستن پنجره" title="بستن (Esc)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dialogue Form -->
+    <form method="post" id="semester-dialog-form" novalidate>
+      {% csrf_token %}
+
+      <div class="alert alert-error" id="dialog-error-box" style="display: none; margin-block-end: 1.25rem;"></div>
+
+      <!-- Start Date (Calculates Season and Year) -->
+      <div class="form-group" style="background-color: var(--bg-muted); padding: 1.1rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-block-end: 1.25rem;">
+        <label for="dialog-start-date" class="form-label" style="display: flex; justify-content: space-between; align-items: center; margin-block-end: 0.4rem;">
+          <span style="font-weight: 700; color: var(--text-primary); font-size: 0.9rem;">
+            📅 تاریخ شروع ترم (تعیین‌کننده فصل و سال)
+          </span>
+          <span style="font-size: 0.75rem; color: var(--accent); font-weight: 500;">
+            محاسبه خودکار تقویم شمسی
+          </span>
+        </label>
+        <input 
+          type="date" 
+          name="start_date" 
+          id="dialog-start-date" 
+          class="form-input" 
+          style="background: var(--bg-surface-elevated);"
+        >
+
+        <!-- Live Dynamic Season and Year Preview Box -->
+        <div id="dialog-season-box" class="season-preview-card" style="display: none; margin-block-start: 0.75rem;">
+          <div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-block-end: 0.2rem;">
+              فصل و سال محاسبه‌شده:
+            </div>
+            <div id="dialog-season-badge" class="season-preview-badge">
+              <!-- Populated dynamically via JS -->
+            </div>
+          </div>
+          <button type="button" id="dialog-btn-use-as-title" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;" title="درج در عنوان ترم">
+            درج در عنوان ترم
+          </button>
+        </div>
+
+        <!-- Quick Semester Date Presets -->
+        <div style="margin-block-start: 0.75rem;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-block-end: 0.35rem;">
+            انتخاب سریع نیم‌سال‌های متداول:
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-ghost btn-sm dialog-quick-date" data-date="2025-09-23" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+              🍂 مهر ۱۴۰۴ (پاییز)
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm dialog-quick-date" data-date="2026-02-04" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+              ❄️ بهمن ۱۴۰۴ (زمستان)
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm dialog-quick-date" data-date="2026-04-04" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+              🌸 فروردین ۱۴۰۵ (بهار)
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm dialog-quick-date" data-date="2026-07-01" style="font-size: 0.72rem; padding: 0.2rem 0.5rem; background: var(--bg-surface); border: 1px solid var(--border-color);">
+              ☀️ تیر ۱۴۰۵ (تابستان)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div class="form-group" style="margin-block-end: 1.25rem;">
+        <label for="dialog-title" class="form-label" style="font-weight: 600;">
+          عنوان ترم <span style="color: var(--danger);">*</span>
+        </label>
+        <input 
+          type="text" 
+          name="title" 
+          id="dialog-title" 
+          class="form-input" 
+          placeholder="مثال: نیم‌سال اول ۱۴۰۴ - ۱۴۰۵" 
+          required 
+          dir="auto"
+        >
+        <span class="form-help">نام یا کد رسمی ترم تحصیلی</span>
+      </div>
+
+      <!-- Order -->
+      <div class="form-group" style="margin-block-end: 1.25rem;">
+        <label for="dialog-order" class="form-label" style="font-weight: 600;">
+          ترتیب نمایش در فهرست
+        </label>
+        <input 
+          type="number" 
+          name="order" 
+          id="dialog-order" 
+          class="form-input" 
+          min="0" 
+          value="0"
+        >
+        <span class="form-help">عدد کمتر در ابتدای لیست قرار می‌گیرد</span>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group" style="margin-block-end: 0.5rem;">
+        <label for="dialog-description" class="form-label" style="font-weight: 600;">
+          توضیحات و تقویم آموزشی (اختیاری)
+        </label>
+        <textarea 
+          name="description" 
+          id="dialog-description" 
+          class="form-textarea" 
+          rows="3" 
+          placeholder="یادداشت‌ها یا تاریخ‌های امتحانی..." 
+          dir="auto"
+        ></textarea>
+      </div>
+
+      <!-- Actions Footer -->
+      <div class="liquid-dialog-footer">
+        <button type="button" class="btn btn-secondary" id="dialog-cancel-btn">
+          انصراف
+        </button>
+        <button type="submit" class="btn btn-primary" id="dialog-submit-btn">
+          <span>ذخیره تغییرات</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Client-Side JavaScript Controller for Liquid Glass Semester Popup Dialogue -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const backdrop = document.getElementById('semester-dialog-backdrop');
+  if (!backdrop) return;
+
+  const form = document.getElementById('semester-dialog-form');
+  const modalTitle = document.getElementById('dialog-semester-title');
+  const modalSubtitle = document.getElementById('dialog-semester-subtitle');
+  const titleInput = document.getElementById('dialog-title');
+  const startDateInput = document.getElementById('dialog-start-date');
+  const orderInput = document.getElementById('dialog-order');
+  const descInput = document.getElementById('dialog-description');
+  const submitBtn = document.getElementById('dialog-submit-btn');
+  const cancelBtn = document.getElementById('dialog-cancel-btn');
+  const closeBtn = document.getElementById('dialog-close-btn');
+  const errorBox = document.getElementById('dialog-error-box');
+  const seasonBox = document.getElementById('dialog-season-box');
+  const seasonBadge = document.getElementById('dialog-season-badge');
+  const useTitleBtn = document.getElementById('dialog-btn-use-as-title');
+  const quickDateBtns = document.querySelectorAll('.dialog-quick-date');
+
+  let currentCalculatedSeasonYear = '';
+
+  const faDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  function toPersianDigits(n) {
+    return String(n).replace(/[0-9]/g, function (w) { return faDigits[+w]; });
+  }
+
+  // Algorithm for Gregorian to Jalali conversion
+  function gregorianToJalali(gy, gm, gd) {
+    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let jy;
+    if (gy > 1600) {
+      jy = 979;
+      gy -= 1600;
+    } else {
+      jy = 0;
+      gy -= 621;
+    }
+    const gy2 = (gm > 2) ? (gy + 1) : gy;
+    let days = (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+    jy += 33 * Math.floor(days / 12053);
+    days %= 12053;
+    jy += 4 * Math.floor(days / 1461);
+    days %= 1461;
+    if (days > 365) {
+      jy += Math.floor((days - 1) / 365);
+      days = (days - 1) % 365;
+    }
+    let jm, jd;
+    if (days < 186) {
+      jm = 1 + Math.floor(days / 31);
+      jd = 1 + (days % 31);
+    } else {
+      jm = 7 + Math.floor((days - 186) / 30);
+      jd = 1 + ((days - 186) % 30);
+    }
+    return { jy: jy, jm: jm, jd: jd };
+  }
+
+  function calculateDialogSeason() {
+    if (!startDateInput) return;
+    const val = startDateInput.value.trim();
+    if (!val) {
+      seasonBox.style.display = 'none';
+      currentCalculatedSeasonYear = '';
+      return;
+    }
+
+    let jy, jm, jd;
+    const parts = val.split(/[-/]/);
+    if (parts.length === 3) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10);
+      const d = parseInt(parts[2], 10);
+      if (y >= 1300 && y <= 1500) {
+        jy = y; jm = m; jd = d;
+      } else if (y > 1900 && y < 2200) {
+        const j = gregorianToJalali(y, m, d);
+        jy = j.jy; jm = j.jm; jd = j.jd;
+      }
+    }
+
+    if (jy && jm) {
+      let seasonName = '';
+      let seasonCode = '';
+      let seasonIcon = '';
+
+      if (jm >= 1 && jm <= 3) {
+        seasonName = 'بهار';
+        seasonCode = 'spring';
+        seasonIcon = '🌸';
+      } else if (jm >= 4 && jm <= 6) {
+        seasonName = 'تابستان';
+        seasonCode = 'summer';
+        seasonIcon = '☀️';
+      } else if (jm >= 7 && jm <= 9) {
+        seasonName = 'پاییز';
+        seasonCode = 'autumn';
+        seasonIcon = '🍂';
+      } else {
+        seasonName = 'زمستان';
+        seasonCode = 'winter';
+        seasonIcon = '❄️';
+      }
+
+      const yearFa = toPersianDigits(jy);
+      const fullLabel = seasonName + ' ' + yearFa;
+      currentCalculatedSeasonYear = fullLabel;
+
+      seasonBadge.className = 'season-preview-badge badge-season-' + seasonCode;
+      seasonBadge.innerHTML = '<span>' + seasonIcon + '</span><span>' + fullLabel + ' (شروع: ' + toPersianDigits(jy) + '/' + toPersianDigits(String(jm).padStart(2, '0')) + '/' + toPersianDigits(String(jd).padStart(2, '0')) + ')</span>';
+      seasonBox.style.display = 'flex';
+    } else {
+      seasonBox.style.display = 'none';
+      currentCalculatedSeasonYear = '';
+    }
+  }
+
+  startDateInput.addEventListener('input', calculateDialogSeason);
+  startDateInput.addEventListener('change', calculateDialogSeason);
+
+  quickDateBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      startDateInput.value = btn.dataset.date;
+      calculateDialogSeason();
+    });
+  });
+
+  if (useTitleBtn) {
+    useTitleBtn.addEventListener('click', function () {
+      if (currentCalculatedSeasonYear) {
+        titleInput.value = 'نیم‌سال ' + currentCalculatedSeasonYear;
+        titleInput.focus();
+      }
+    });
+  }
+
+  function openDialog(isEdit, data) {
+    errorBox.style.display = 'none';
+    errorBox.innerHTML = '';
+    if (isEdit && data) {
+      modalTitle.textContent = 'ویرایش ترم تحصیلی';
+      modalSubtitle.textContent = 'ویرایش اطلاعات و مشخصات «' + data.title + '»';
+      titleInput.value = data.title || '';
+      startDateInput.value = data.startDate || '';
+      orderInput.value = data.order || '0';
+      descInput.value = data.description || '';
+      form.action = data.editUrl;
+      submitBtn.querySelector('span').textContent = 'ذخیره تغییرات';
+    } else {
+      modalTitle.textContent = 'افزودن ترم تحصیلی جدید';
+      modalSubtitle.textContent = 'پیکربندی تقویم آموزشی و تفکیک خودکار نیم‌سال';
+      titleInput.value = '';
+      startDateInput.value = '';
+      orderInput.value = '1';
+      descInput.value = '';
+      form.action = data && data.createUrl ? data.createUrl : '{% url "library:semester_create" %}';
+      submitBtn.querySelector('span').textContent = 'ایجاد ترم تحصیلی';
+    }
+
+    calculateDialogSeason();
+    backdrop.classList.add('is-open');
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () {
+      titleInput.focus();
+    }, 120);
+  }
+
+  function closeDialog() {
+    backdrop.classList.remove('is-open');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  // Hook all Edit buttons
+  document.querySelectorAll('.btn-open-edit-semester').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openDialog(true, {
+        id: btn.dataset.id,
+        title: btn.dataset.title,
+        startDate: btn.dataset.startDate,
+        order: btn.dataset.order,
+        description: btn.dataset.description,
+        editUrl: btn.dataset.editUrl
+      });
+    });
+  });
+
+  // Hook all Create buttons
+  document.querySelectorAll('.btn-open-create-semester').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openDialog(false, {
+        createUrl: btn.dataset.createUrl
+      });
+    });
+  });
+
+  // Close triggers
+  if (closeBtn) closeBtn.addEventListener('click', closeDialog);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeDialog);
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) closeDialog();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && backdrop.classList.contains('is-open')) {
+      closeDialog();
+    }
+  });
+
+  // Form submission with AJAX and fallback
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    errorBox.innerHTML = '';
+    submitBtn.disabled = true;
+    const btnSpan = submitBtn.querySelector('span');
+    const originalText = btnSpan.textContent;
+    btnSpan.textContent = 'در حال ذخیره‌سازی...';
+
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(function (res) {
+      if (res.ok) {
+        return res.json().then(function (data) {
+          // Success: smoothly reload page to refresh table and badges
+          window.location.reload();
+        });
+      } else {
+        return res.json().then(function (data) {
+          let errorHtml = '<strong>خطا در اعتبارسنجی:</strong><ul style="margin: 0.5rem 1rem 0 0; padding: 0;">';
+          if (data.errors) {
+            for (const field in data.errors) {
+              const errs = data.errors[field];
+              errs.forEach(function (err) {
+                errorHtml += '<li>' + (err.message || err) + '</li>';
+              });
+            }
+          } else {
+            errorHtml += '<li>لطفاً مقادیر وارد شده را مجدداً بررسی فرمایید.</li>';
+          }
+          errorHtml += '</ul>';
+          errorBox.innerHTML = errorHtml;
+          errorBox.style.display = 'block';
+          submitBtn.disabled = false;
+          btnSpan.textContent = originalText;
+        });
+      }
+    })
+    .catch(function () {
+      // Network error or unexpected fallback: submit normally
+      form.submit();
+    });
+  });
+});
+</script>
 {% endif %}
 {% endblock %}

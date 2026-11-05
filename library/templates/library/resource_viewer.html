@@ -136,56 +136,145 @@
       </div>
 
     {% elif resource.preview_type == 'audio' %}
-      <!-- Audio In-Browser Preview (Apple Podcasts / Music Style) -->
+      <!-- Custom Liquid Glass Audio Player (Apple visionOS / iOS Liquid Glass Experience) -->
       <div class="preview-stage-media">
-        <div class="audio-player-card">
-          <div class="audio-artwork-box">
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 18V5l12-2v13"></path>
-              <circle cx="6" cy="18" r="3"></circle>
-              <circle cx="18" cy="16" r="3"></circle>
-            </svg>
-          </div>
-
-          <div class="audio-details">
-            <span class="file-type-badge file-type-{{ resource.file_extension }}" style="margin-block-end: 0.5rem;">
-              {{ resource.file_extension|upper }}
-            </span>
-            <h2 class="audio-title">{{ resource.title }}</h2>
-            {% if lesson %}
-              <div class="audio-subtitle">{{ lesson.title }}{% if lesson.professor %} · {{ lesson.professor }}{% endif %}</div>
-            {% endif %}
-          </div>
-
-          <audio id="media-audio-element" controls preload="metadata" class="apple-audio-element">
+        <div class="liquid-glass-audio-player lg-glass">
+          <!-- Hidden Native Audio Engine -->
+          <audio id="media-audio-element" preload="metadata">
             <source src="{% url 'library:resource_raw_stream' resource.id %}" type="audio/{{ resource.file_extension|default:'mpeg' }}">
             مرورگر شما از پخش مستقیم این فایل صوتی پشتیبانی نمی‌کند.
           </audio>
 
-          <div class="audio-controls-row">
-            <div class="audio-skip-buttons">
-              <button type="button" class="btn btn-secondary btn-sm" onclick="skipAudio(-15)" title="۱۵ ثانیه به عقب">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
-                </svg>
-                <span>-۱۵ ثانیه</span>
-              </button>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="skipAudio(15)" title="۱۵ ثانیه به جلو">
-                <span>+۱۵ ثانیه</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
-                </svg>
-              </button>
+          <!-- Top Track Header with Specular Liquid Vinyl Artwork -->
+          <div class="liquid-audio-header">
+            <div class="liquid-audio-artwork" id="liquid-artwork">
+              <div class="artwork-specular-ring"></div>
+              <svg class="artwork-vinyl-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="4"></circle>
+                <line x1="12" y1="2" x2="12" y2="4"></line>
+              </svg>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span class="media-speed-label">سرعت:</span>
-              <div class="media-speed-buttons">
-                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 0.75, this)">0.75x</button>
-                <button type="button" class="btn btn-ghost btn-xs speed-btn active" onclick="setMediaSpeed('media-audio-element', 1.0, this)">1x</button>
-                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 1.25, this)">1.25x</button>
-                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 1.5, this)">1.5x</button>
-                <button type="button" class="btn btn-ghost btn-xs speed-btn" onclick="setMediaSpeed('media-audio-element', 2.0, this)">2x</button>
+            <div class="liquid-audio-meta">
+              <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center; margin-block-end: 0.4rem;">
+                <span class="file-type-badge file-type-{{ resource.file_extension }}">
+                  {{ resource.file_extension|upper }}
+                </span>
+                <span class="liquid-pill-status" id="audio-play-status">آماده پخش</span>
+              </div>
+              <h2 class="liquid-audio-title">{{ resource.title }}</h2>
+              {% if lesson %}
+                <div class="liquid-audio-subtitle">{{ lesson.title }}{% if lesson.professor %} · استاد {{ lesson.professor }}{% endif %}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Interactive Liquid Soundwave Spectrum Visualization -->
+          <div class="liquid-soundwave-container" id="liquid-soundwave" aria-label="طیف‌نگار صدا">
+            <div class="liquid-wave-bar" style="--bar-h: 30%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 48%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 70%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 88%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 55%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 92%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 78%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 45%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 82%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 100%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 62%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 42%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 75%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 96%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 52%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 86%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 72%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 44%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 92%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 64%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 82%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 95%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 48%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 78%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 62%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 36%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 74%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 90%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 52%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 68%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 42%;"></div>
+            <div class="liquid-wave-bar" style="--bar-h: 24%;"></div>
+          </div>
+
+          <!-- Liquid Progress Scrubber Bar & Jalali Timestamps -->
+          <div class="liquid-scrubber-section">
+            <div class="liquid-scrubber-track" id="audio-scrubber-track" role="slider" aria-label="موقعیت زمانی فایل صوتی" tabindex="0">
+              <div class="liquid-scrubber-buffered" id="audio-scrubber-buffered"></div>
+              <div class="liquid-scrubber-fill" id="audio-scrubber-fill"></div>
+              <div class="liquid-scrubber-thumb" id="audio-scrubber-thumb"></div>
+            </div>
+            <div class="liquid-scrubber-times">
+              <span class="liquid-time" id="audio-time-current">۰:۰۰</span>
+              <span class="liquid-time" id="audio-time-total">۰:۰۰</span>
+            </div>
+          </div>
+
+          <!-- Primary Liquid Playback Controls -->
+          <div class="liquid-playback-row">
+            <button type="button" class="liquid-pill-btn" onclick="skipAudio(-15)" title="۱۵ ثانیه به عقب">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
+              </svg>
+              <span>۱۵- ثانیه</span>
+            </button>
+
+            <!-- Master Liquid Play / Pause Button with physical refractive bevel -->
+            <button type="button" class="liquid-master-play-btn" id="audio-master-play-btn" onclick="toggleAudioPlay()" aria-label="پخش یا توقف صدا">
+              <span class="play-btn-glow"></span>
+              <svg class="play-icon" id="audio-play-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <svg class="pause-icon" id="audio-pause-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+                <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+              </svg>
+            </button>
+
+            <button type="button" class="liquid-pill-btn" onclick="skipAudio(15)" title="۱۵ ثانیه به جلو">
+              <span>۱۵+ ثانیه</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Secondary Liquid Controls: Volume & Segmented Speed Pill -->
+          <div class="liquid-secondary-row">
+            <!-- Liquid Volume Capsule -->
+            <div class="liquid-volume-capsule">
+              <button type="button" class="liquid-volume-btn" id="audio-mute-btn" onclick="toggleMute()" title="بی‌صدا کردن">
+                <svg id="volume-icon-high" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                </svg>
+                <svg id="volume-icon-muted" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                  <line x1="23" y1="9" x2="17" y2="15"></line>
+                  <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>
+              </button>
+              <input type="range" class="liquid-volume-slider" id="audio-volume-slider" min="0" max="1" step="0.05" value="1" oninput="setAudioVolume(this.value)" aria-label="تنظیم شدت صدا">
+            </div>
+
+            <!-- Apple Liquid Segmented Speed Bar -->
+            <div class="liquid-speed-segmented">
+              <span class="liquid-speed-title">سرعت:</span>
+              <div class="liquid-segmented-track">
+                <button type="button" class="liquid-segment-item" onclick="setLiquidAudioSpeed(0.75, this)">0.75x</button>
+                <button type="button" class="liquid-segment-item active" onclick="setLiquidAudioSpeed(1.0, this)">1x</button>
+                <button type="button" class="liquid-segment-item" onclick="setLiquidAudioSpeed(1.25, this)">1.25x</button>
+                <button type="button" class="liquid-segment-item" onclick="setLiquidAudioSpeed(1.5, this)">1.5x</button>
+                <button type="button" class="liquid-segment-item" onclick="setLiquidAudioSpeed(2.0, this)">2x</button>
               </div>
             </div>
           </div>
@@ -328,12 +417,6 @@
     }
   }
 
-  function skipAudio(seconds) {
-    const audio = document.getElementById('media-audio-element');
-    if (!audio) return;
-    audio.currentTime = Math.max(0, Math.min(audio.duration || Infinity, audio.currentTime + seconds));
-  }
-
   function togglePip(elementId) {
     const video = document.getElementById(elementId);
     if (!video) return;
@@ -342,6 +425,187 @@
     } else if (video.requestPictureInPicture) {
       video.requestPictureInPicture().catch(() => {});
     }
+  }
+
+  /* ==========================================================================
+     Liquid Glass Audio Player Controller
+     ========================================================================== */
+  const persianDigitsMap = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  function toPersianDigits(str) {
+    return String(str).replace(/[0-9]/g, w => persianDigitsMap[+w]);
+  }
+
+  function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return toPersianDigits('0:00');
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return toPersianDigits(mins + ':' + (secs < 10 ? '0' : '') + secs);
+  }
+
+  const audioEl = document.getElementById('media-audio-element');
+  const playBtn = document.getElementById('audio-master-play-btn');
+  const playIcon = document.getElementById('audio-play-icon');
+  const pauseIcon = document.getElementById('audio-pause-icon');
+  const playStatus = document.getElementById('audio-play-status');
+  const timeCurrent = document.getElementById('audio-time-current');
+  const timeTotal = document.getElementById('audio-time-total');
+  const scrubberTrack = document.getElementById('audio-scrubber-track');
+  const scrubberFill = document.getElementById('audio-scrubber-fill');
+  const scrubberThumb = document.getElementById('audio-scrubber-thumb');
+  const scrubberBuffered = document.getElementById('audio-scrubber-buffered');
+  const artwork = document.getElementById('liquid-artwork');
+  const soundwave = document.getElementById('liquid-soundwave');
+  const volumeSlider = document.getElementById('audio-volume-slider');
+  const volumeIconHigh = document.getElementById('volume-icon-high');
+  const volumeIconMuted = document.getElementById('volume-icon-muted');
+
+  let isSeeking = false;
+
+  function toggleAudioPlay() {
+    if (!audioEl) return;
+    if (audioEl.paused) {
+      audioEl.play().catch(() => {});
+    } else {
+      audioEl.pause();
+    }
+  }
+
+  function skipAudio(seconds) {
+    if (!audioEl) return;
+    const dur = audioEl.duration || 0;
+    audioEl.currentTime = Math.max(0, Math.min(dur || Infinity, audioEl.currentTime + seconds));
+  }
+
+  function setLiquidAudioSpeed(speed, btn) {
+    if (!audioEl) return;
+    audioEl.playbackRate = speed;
+    if (btn && btn.parentElement) {
+      btn.parentElement.querySelectorAll('.liquid-segment-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  }
+
+  function setAudioVolume(val) {
+    if (!audioEl) return;
+    audioEl.volume = parseFloat(val);
+    audioEl.muted = (audioEl.volume === 0);
+    updateVolumeUI();
+  }
+
+  function toggleMute() {
+    if (!audioEl) return;
+    audioEl.muted = !audioEl.muted;
+    updateVolumeUI();
+  }
+
+  function updateVolumeUI() {
+    if (!audioEl) return;
+    const isMuted = audioEl.muted || audioEl.volume === 0;
+    if (volumeIconHigh && volumeIconMuted) {
+      volumeIconHigh.style.display = isMuted ? 'none' : 'block';
+      volumeIconMuted.style.display = isMuted ? 'block' : 'none';
+    }
+    if (volumeSlider) {
+      volumeSlider.value = isMuted ? 0 : audioEl.volume;
+    }
+  }
+
+  if (audioEl) {
+    audioEl.addEventListener('play', () => {
+      if (playIcon) playIcon.style.display = 'none';
+      if (pauseIcon) pauseIcon.style.display = 'block';
+      if (playBtn) playBtn.classList.add('playing');
+      if (artwork) artwork.classList.add('spinning');
+      if (soundwave) soundwave.classList.add('active');
+      if (playStatus) playStatus.innerText = 'در حال پخش';
+    });
+
+    audioEl.addEventListener('pause', () => {
+      if (playIcon) playIcon.style.display = 'block';
+      if (pauseIcon) pauseIcon.style.display = 'none';
+      if (playBtn) playBtn.classList.remove('playing');
+      if (artwork) artwork.classList.remove('spinning');
+      if (soundwave) soundwave.classList.remove('active');
+      if (playStatus) playStatus.innerText = 'متوقف شد';
+    });
+
+    audioEl.addEventListener('ended', () => {
+      if (playIcon) playIcon.style.display = 'block';
+      if (pauseIcon) pauseIcon.style.display = 'none';
+      if (playBtn) playBtn.classList.remove('playing');
+      if (artwork) artwork.classList.remove('spinning');
+      if (soundwave) soundwave.classList.remove('active');
+      if (playStatus) playStatus.innerText = 'پایان پخش';
+    });
+
+    audioEl.addEventListener('loadedmetadata', () => {
+      if (timeTotal) timeTotal.innerText = formatTime(audioEl.duration);
+    });
+
+    audioEl.addEventListener('durationchange', () => {
+      if (timeTotal) timeTotal.innerText = formatTime(audioEl.duration);
+    });
+
+    audioEl.addEventListener('timeupdate', () => {
+      if (isSeeking) return;
+      const cur = audioEl.currentTime || 0;
+      const dur = audioEl.duration || 0;
+      if (timeCurrent) timeCurrent.innerText = formatTime(cur);
+      if (dur > 0) {
+        const pct = (cur / dur) * 100;
+        if (scrubberFill) scrubberFill.style.width = pct + '%';
+        if (scrubberThumb) scrubberThumb.style.insetInlineStart = pct + '%';
+      }
+    });
+
+    audioEl.addEventListener('progress', () => {
+      if (audioEl.buffered.length > 0 && audioEl.duration > 0) {
+        const bufferedEnd = audioEl.buffered.end(audioEl.buffered.length - 1);
+        const pct = (bufferedEnd / audioEl.duration) * 100;
+        if (scrubberBuffered) scrubberBuffered.style.width = pct + '%';
+      }
+    });
+
+    // Scrubber click & drag handler (RTL aware)
+    function seekFromEvent(e) {
+      if (!scrubberTrack || !audioEl || !audioEl.duration) return;
+      const rect = scrubberTrack.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const isRTL = document.documentElement.dir === 'rtl';
+      // In RTL layout, 0% is on the right side if inverted, but flex/ltr scrubber uses standard left-to-right bar
+      const ratio = Math.max(0, Math.min(1, isRTL ? (1 - (clickX / rect.width)) : (clickX / rect.width)));
+      audioEl.currentTime = ratio * audioEl.duration;
+    }
+
+    if (scrubberTrack) {
+      scrubberTrack.addEventListener('click', seekFromEvent);
+
+      scrubberTrack.addEventListener('mousedown', (e) => {
+        isSeeking = true;
+        seekFromEvent(e);
+        const onMouseMove = (ev) => { if (isSeeking) seekFromEvent(ev); };
+        const onMouseUp = () => {
+          isSeeking = false;
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mouseup', onMouseUp);
+        };
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+      });
+    }
+
+    // Spacebar to toggle playback when not typing in an input
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleAudioPlay();
+      } else if (e.code === 'ArrowRight') {
+        skipAudio(document.documentElement.dir === 'rtl' ? -5 : 5);
+      } else if (e.code === 'ArrowLeft') {
+        skipAudio(document.documentElement.dir === 'rtl' ? 5 : -5);
+      }
+    });
   }
 </script>
 {% endblock %}
