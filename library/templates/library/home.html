@@ -270,7 +270,7 @@
       <tbody>
         {% for item in standalone_resources %}
           <tr>
-            <td>
+            <td data-label="عنوان و مشخصات فایل">
               <div class="file-cell">
                 <span class="file-type-badge file-type-{{ item.file_extension }}">
                   {{ item.file_extension|default:"file" }}
@@ -295,13 +295,13 @@
               </div>
             </td>
 
-            <td>
+            <td data-label="نوع منبع">
               <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">
                 {{ item.get_kind_display }}
               </span>
             </td>
 
-            <td>
+            <td data-label="ترم / دسترسی">
               {% if item.semester %}
                 <a href="{% url 'library:home' %}?semester={{ item.semester.id }}" class="lesson-count-pill has-lessons" style="font-size: 0.8rem; text-decoration: none;" title="مشاهده محتوای این ترم">
                   {{ item.semester.title }}
@@ -313,15 +313,15 @@
               {% endif %}
             </td>
 
-            <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+            <td data-label="حجم فایل" style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
               {{ item.file_size|persian_filesize }}
             </td>
 
-            <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+            <td data-label="تعداد دانلود" style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
               {{ item.download_count|persian_digits }}
             </td>
 
-            <td style="text-align: end;">
+            <td data-label="دریافت و عملیات" style="text-align: end;">
               <div class="file-action-buttons" style="justify-content: flex-end;">
                 {% if item.can_preview_in_browser %}
                   <a href="{% url 'library:resource_viewer' item.pk %}" class="btn btn-secondary btn-sm" title="پیش‌نمایش آنلاین در مرورگر">

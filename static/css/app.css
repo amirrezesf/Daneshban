@@ -36,12 +36,12 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Vazirmatn", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
   /* Liquid Glass Design Tokens (Apple visionOS / iOS Liquid Glass HIG - Light Theme) */
-  --bg-app: #f4f5f8;
-  --bg-surface: rgba(255, 255, 255, 0.68);
-  --bg-surface-elevated: rgba(255, 255, 255, 0.84);
-  --bg-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.46) 100%);
-  --bg-surface-glass-card: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.50) 100%);
-  --bg-surface-glass-elevated: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.65) 100%);
+  --bg-app: #eef2f9;
+  --bg-surface: rgba(255, 255, 255, 0.60);
+  --bg-surface-elevated: rgba(255, 255, 255, 0.80);
+  --bg-surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.70) 0%, rgba(255, 255, 255, 0.40) 100%);
+  --bg-surface-glass-card: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.42) 100%);
+  --bg-surface-glass-elevated: linear-gradient(135deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0.58) 100%);
   --bg-muted: rgba(142, 142, 147, 0.09);
   --bg-subtle: rgba(142, 142, 147, 0.16);
 
@@ -96,9 +96,9 @@
   --glass-specular-pill: inset 0 1px 0.5px rgba(255, 255, 255, 0.95), inset 0 -1px 0.5px rgba(0, 0, 0, 0.04);
 
   /* Backdrop blur and saturation for refraction */
-  --glass-blur: blur(26px) saturate(190%);
-  --glass-blur-deep: blur(34px) saturate(200%);
-  --glass-blur-subtle: blur(14px) saturate(170%);
+  --glass-blur: blur(28px) saturate(210%);
+  --glass-blur-deep: blur(36px) saturate(220%);
+  --glass-blur-subtle: blur(16px) saturate(180%);
 
   /* Ambient shadows with physical depth */
   --shadow-xs: 0 1px 3px rgba(15, 23, 42, 0.04);
@@ -131,12 +131,12 @@ html[data-theme="light"] {
 
 /* Liquid Glass Dark Theme (visionOS Dark Glass & Deep Void Environment) */
 html[data-theme="dark"] {
-  --bg-app: #090a0f;
-  --bg-surface: rgba(24, 25, 34, 0.65);
-  --bg-surface-elevated: rgba(34, 36, 48, 0.8);
-  --bg-surface-glass: linear-gradient(135deg, rgba(28, 30, 42, 0.72) 0%, rgba(16, 17, 26, 0.54) 100%);
-  --bg-surface-glass-card: linear-gradient(135deg, rgba(32, 34, 48, 0.75) 0%, rgba(18, 20, 30, 0.58) 100%);
-  --bg-surface-glass-elevated: linear-gradient(135deg, rgba(42, 45, 62, 0.82) 0%, rgba(24, 26, 38, 0.68) 100%);
+  --bg-app: #080914;
+  --bg-surface: rgba(20, 22, 34, 0.58);
+  --bg-surface-elevated: rgba(30, 33, 46, 0.76);
+  --bg-surface-glass: linear-gradient(135deg, rgba(26, 28, 42, 0.68) 0%, rgba(14, 15, 24, 0.46) 100%);
+  --bg-surface-glass-card: linear-gradient(135deg, rgba(30, 32, 48, 0.70) 0%, rgba(16, 17, 28, 0.48) 100%);
+  --bg-surface-glass-elevated: linear-gradient(135deg, rgba(38, 42, 60, 0.78) 0%, rgba(22, 24, 36, 0.60) 100%);
   --bg-muted: rgba(255, 255, 255, 0.07);
   --bg-subtle: rgba(255, 255, 255, 0.13);
 
@@ -197,12 +197,12 @@ html[data-theme="dark"] {
 
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
-    --bg-app: #090a0f;
-    --bg-surface: rgba(24, 25, 34, 0.65);
-    --bg-surface-elevated: rgba(34, 36, 48, 0.8);
-    --bg-surface-glass: linear-gradient(135deg, rgba(28, 30, 42, 0.72) 0%, rgba(16, 17, 26, 0.54) 100%);
-    --bg-surface-glass-card: linear-gradient(135deg, rgba(32, 34, 48, 0.75) 0%, rgba(18, 20, 30, 0.58) 100%);
-    --bg-surface-glass-elevated: linear-gradient(135deg, rgba(42, 45, 62, 0.82) 0%, rgba(24, 26, 38, 0.68) 100%);
+    --bg-app: #080914;
+    --bg-surface: rgba(20, 22, 34, 0.58);
+    --bg-surface-elevated: rgba(30, 33, 46, 0.76);
+    --bg-surface-glass: linear-gradient(135deg, rgba(26, 28, 42, 0.68) 0%, rgba(14, 15, 24, 0.46) 100%);
+    --bg-surface-glass-card: linear-gradient(135deg, rgba(30, 32, 48, 0.70) 0%, rgba(16, 17, 28, 0.48) 100%);
+    --bg-surface-glass-elevated: linear-gradient(135deg, rgba(38, 42, 60, 0.78) 0%, rgba(22, 24, 36, 0.60) 100%);
     --bg-muted: rgba(255, 255, 255, 0.07);
     --bg-subtle: rgba(255, 255, 255, 0.13);
 
@@ -2870,4 +2870,309 @@ html[data-theme="dark"] .liquid-dialog-card {
   margin-block-start: 1.75rem;
   padding-block-start: 1.25rem;
   border-block-start: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   Table of Contents (فهرست محتوای درس) & Mobile Vertical Layout
+   ========================================================================== */
+.lesson-toc-panel {
+  background: var(--bg-surface-glass-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-block-end: 2rem;
+  box-shadow: var(--glass-specular), var(--shadow-xs);
+  transition: all var(--transition-normal);
+}
+
+html[data-theme="dark"] .lesson-toc-panel {
+  border-top: 1.5px solid rgba(255, 255, 255, 0.25);
+}
+
+.lesson-toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 1rem;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.lesson-toc-icon-bullet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(0, 113, 227, 0.1);
+  color: var(--accent);
+}
+
+.lesson-toc-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.lesson-toc-summary {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-muted);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.lesson-toc-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.65rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lesson-toc-item {
+  display: block;
+}
+
+.lesson-toc-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.lesson-toc-link:hover {
+  background: var(--bg-surface-elevated);
+  border-color: var(--accent-border);
+  color: var(--accent);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.12);
+}
+
+.lesson-toc-link-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lesson-toc-symbol {
+  font-size: 1.05rem;
+}
+
+.lesson-toc-label {
+  font-size: 0.9rem;
+}
+
+.lesson-toc-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lesson-toc-counter {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.lesson-toc-arrow {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: transform var(--transition-fast);
+}
+
+.lesson-toc-link:hover .lesson-toc-arrow {
+  color: var(--accent);
+  transform: translateX(-3px);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile Phone Responsive: Vertical Rather Than Horizontal Layout
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Table of Contents: Force Clean Vertical Stack on Mobile */
+  .lesson-toc-list {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0.5rem !important;
+  }
+
+  .lesson-toc-item {
+    width: 100% !important;
+  }
+
+  .lesson-toc-link {
+    width: 100% !important;
+    padding: 0.85rem 1rem !important;
+    background: var(--bg-surface-elevated) !important;
+  }
+
+  /* Table of Contents Panels / Tables: Transform Horizontal Rows into Vertical Cards */
+  .resources-table,
+  .semesters-table,
+  .resources-table tbody,
+  .semesters-table tbody {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .resources-table thead,
+  .semesters-table thead {
+    display: none !important; /* Hide wide table headers */
+  }
+
+  .resources-table tbody tr,
+  .semesters-table tbody tr {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.65rem !important;
+    padding: 1.15rem 1.25rem !important;
+    margin-block-end: 1rem !important;
+    background: var(--bg-surface-glass-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--glass-specular), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    position: relative !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  html[data-theme="dark"] .resources-table tbody tr,
+  html[data-theme="dark"] .semesters-table tbody tr {
+    background: rgba(30, 30, 34, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  .resources-table td,
+  .semesters-table td {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.2rem 0 !important;
+    border: none !important;
+    font-size: 0.875rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: start !important;
+  }
+
+  /* First cell (File name and Badge) occupies full top row */
+  .resources-table td:first-child,
+  .semesters-table td:first-child {
+    display: block !important;
+    margin-block-end: 0.35rem !important;
+    padding-block-end: 0.5rem !important;
+    border-block-end: 1px solid var(--border-subtle) !important;
+  }
+
+  .file-name-title {
+    font-size: 0.975rem !important;
+    font-weight: 700 !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Show Persian attribute labels on mobile for clarity */
+  .resources-table td:not(:first-child):not(:last-child)::before,
+  .semesters-table td:not(:first-child):not(:last-child)::before {
+    content: attr(data-label);
+    font-size: 0.775rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  /* Actions at bottom of card: Full-width touch-friendly layout */
+  .resources-table td:last-child,
+  .semesters-table td:last-child {
+    display: flex !important;
+    justify-content: stretch !important;
+    border-block-start: 1px solid var(--border-subtle) !important;
+    padding-block-start: 0.85rem !important;
+    margin-block-start: 0.35rem !important;
+    width: 100% !important;
+  }
+
+  .resources-table .table-actions,
+  .resources-table .file-action-buttons {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .resources-table .table-actions .btn,
+  .resources-table .file-action-buttons .btn {
+    justify-content: center !important;
+    width: 100% !important;
+    padding: 0.55rem 0.75rem !important;
+    font-size: 0.825rem !important;
+  }
+
+  .semesters-table .action-icon-group {
+    display: flex !important;
+    width: 100% !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Catalog Toolbar & Filters on mobile: Vertical stack */
+  .catalog-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+    padding: 1rem !important;
+  }
+
+  .search-input-wrapper {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+
+  .filter-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 0.65rem !important;
+  }
+
+  .filter-select {
+    width: 100% !important;
+  }
+
+  .filter-group .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Metrics Strip on Mobile: Vertical Stack */
+  .metrics-strip {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .metric-item {
+    padding: 0.9rem 1rem !important;
+  }
 }

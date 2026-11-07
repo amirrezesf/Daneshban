@@ -77,11 +77,54 @@
   {% endif %}
 </header>
 
-<!-- Resource Groups -->
+<!-- Table of Contents / Quick Jump Navigator (فهرست محتوای درس) -->
 {% if resource_groups %}
+  <nav class="lesson-toc-panel lg-glass" aria-label="فهرست محتوای درس">
+    <div class="lesson-toc-header">
+      <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <span class="lesson-toc-icon-bullet" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+        </span>
+        <h2 class="lesson-toc-title">فهرست سرفصل‌ها و محتوای درس (Table of Contents)</h2>
+      </div>
+      <span class="lesson-toc-summary">{{ total_resources|persian_digits }} فایل در {{ resource_groups|length|persian_digits }} دسته‌بندی</span>
+    </div>
+    <ul class="lesson-toc-list" role="list">
+      {% for group in resource_groups %}
+        <li class="lesson-toc-item">
+          <a href="#group-section-{{ group.code }}" class="lesson-toc-link">
+            <span class="lesson-toc-link-main">
+              <span class="lesson-toc-symbol">
+                {% if group.code == 'handout' %}📄
+                {% elif group.code == 'slides' %}🖥️
+                {% elif group.code == 'assignment' %}📝
+                {% elif group.code == 'exam' %}🎯
+                {% elif group.code == 'book' %}📚
+                {% elif group.code == 'recording' %}🎙️
+                {% else %}📁{% endif %}
+              </span>
+              <span class="lesson-toc-label">{{ group.label }}‌ها</span>
+            </span>
+            <span class="lesson-toc-meta">
+              <span class="lesson-toc-counter">{{ group.count|persian_digits }} مورد</span>
+              <span class="lesson-toc-arrow">←</span>
+            </span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+
   <div class="resource-groups-container">
     {% for group in resource_groups %}
-      <section class="resource-group-panel" aria-labelledby="group-title-{{ group.code }}">
+      <section class="resource-group-panel" id="group-section-{{ group.code }}" aria-labelledby="group-title-{{ group.code }}">
         <header class="resource-group-header">
           <h2 id="group-title-{{ group.code }}" class="resource-group-heading">
             {% if group.code == 'handout' %}
@@ -124,7 +167,7 @@
           <tbody>
             {% for item in group.items %}
               <tr>
-                <td>
+                <td data-label="عنوان و مشخصات فایل">
                   <div class="file-cell">
                     <span class="file-type-badge file-type-{{ item.file_extension }}">
                       {{ item.file_extension|default:"file" }}
@@ -145,7 +188,7 @@
                   </div>
                 </td>
 
-                <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+                <td data-label="شماره جلسه" style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
                   {% if item.session_number %}
                     جلسه {{ item.session_number|persian_digits }}
                   {% else %}
@@ -153,19 +196,19 @@
                   {% endif %}
                 </td>
 
-                <td style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
+                <td data-label="حجم فایل" style="color: var(--text-secondary); font-variant-numeric: tabular-nums;">
                   {{ item.file_size|persian_filesize }}
                 </td>
 
-                <td style="color: var(--text-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums;">
+                <td data-label="تاریخ بارگذاری" style="color: var(--text-muted); font-size: 0.85rem; font-variant-numeric: tabular-nums;">
                   {{ item.uploaded_at|jalali_date }}
                 </td>
 
-                <td style="color: var(--text-muted); font-variant-numeric: tabular-nums;">
+                <td data-label="تعداد دانلود" style="color: var(--text-muted); font-variant-numeric: tabular-nums;">
                   {{ item.download_count|persian_digits }}
                 </td>
 
-                <td>
+                <td data-label="عملیات و دریافت">
                   <div class="table-actions" style="display: flex; align-items: center; justify-content: flex-end; gap: 0.4rem; flex-wrap: wrap;">
                     {% if item.can_preview_in_browser %}
                       <a href="{% url 'library:resource_viewer' item.id %}" class="btn btn-secondary btn-sm" title="پیش‌نمایش در مرورگر">

@@ -121,14 +121,14 @@
         {% for sem in semesters %}
           <tr>
             <!-- Order Pill -->
-            <td style="text-align: center;">
+            <td data-label="ترتیب اولویت" style="text-align: center;">
               <span class="order-pill" title="اولویت نمایش: {{ sem.order|persian_digits }}">
                 {{ sem.order|persian_digits }}
               </span>
             </td>
 
             <!-- Title & Description -->
-            <td>
+            <td data-label="عنوان و مشخصات ترم">
               <div style="font-weight: 600; font-size: 0.975rem; color: var(--text-primary); margin-block-end: 0.2rem;">
                 <a href="{% url 'library:home' %}?semester={{ sem.id }}" style="color: inherit; text-decoration: none;" title="مشاهده درس‌های این ترم">
                   {{ sem.title }}
@@ -142,7 +142,7 @@
             </td>
 
             <!-- Season and Year Badge -->
-            <td>
+            <td data-label="فصل و سال">
               {% if sem.season_info %}
                 <span class="badge-season badge-season-{{ sem.season_info.season_code }}" title="محاسبه‌شده بر اساس تاریخ شروع: {{ sem.season_info.j_date_str }}">
                   <span>{{ sem.season_info.icon }}</span>
@@ -156,7 +156,7 @@
             </td>
 
             <!-- Clean Start Date with Subtle Icon (No Raw Monospace Clutter) -->
-            <td>
+            <td data-label="تاریخ شروع">
               {% if sem.start_date %}
                 <div style="display: flex; align-items: center; gap: 0.45rem; color: var(--text-secondary); font-size: 0.875rem; font-weight: 500;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted); flex-shrink: 0;">
@@ -173,7 +173,7 @@
             </td>
 
             <!-- Lessons Count Pill -->
-            <td style="text-align: center;">
+            <td data-label="تعداد دروس تخصیص‌یافته" style="text-align: center;">
               {% if sem.lessons_total > 0 %}
                 <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="lesson-count-pill has-lessons" title="مشاهده {{ sem.lessons_total|persian_digits }} درس">
                   <span>{{ sem.lessons_total|persian_digits }} درس</span>
@@ -186,7 +186,7 @@
             </td>
 
             <!-- Icon-Only Action Buttons (Clean & Uncrowded) -->
-            <td style="text-align: center;">
+            <td data-label="عملیات و مدیریت" style="text-align: center;">
               <div class="action-icon-group">
                 <!-- View Lessons Icon Button -->
                 <a href="{% url 'library:home' %}?semester={{ sem.id }}" class="action-icon-btn action-icon-btn-view" title="مشاهده دروس این ترم" aria-label="مشاهده دروس">
